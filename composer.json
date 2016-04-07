@@ -1,0 +1,21 @@
+{
+    "name": "elchroy/lemogis",
+    "authors": [
+        {
+            "name": "andela-celisha-wigwe",
+            "email": "chijioke.elisha-wigwe@andela.com"
+        }
+    ],
+
+    "autoload": {
+        "psr-4": {
+            "Elchroy\\Lemogis\\": "src/app/"
+        }
+    },
+    "require": {
+        "slim/slim": "^3.1",
+        "illuminate/database": "^5.2",
+        "firebase/php-jwt": "^3.0",
+        "guzzlehttp/guzzle": "~6.0"
+    }
+}
