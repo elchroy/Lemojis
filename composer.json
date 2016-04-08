@@ -15,7 +15,9 @@
     "require": {
         "slim/slim": "^3.1",
         "illuminate/database": "^5.2",
-        "firebase/php-jwt": "^3.0",
-        "guzzlehttp/guzzle": "~6.0"
+        "firebase/php-jwt": "^3.0"
+    },
+    "require-dev" : {
+        "satooshi/php-coveralls" : "^1.0"
     }
 }
