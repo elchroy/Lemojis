@@ -12,9 +12,9 @@
             "Elchroy\\Lemogis\\": "src/app/"
         }
     },
-    "require": {
-        // "slim/slim": "^3.1",
-        // "illuminate/database": "^5.2",
-        // "firebase/php-jwt": "^3.0"
-    }
+    // "require": {
+    //     "slim/slim": "^3.1",
+    //     "illuminate/database": "^5.2",
+    //     "firebase/php-jwt": "^3.0"
+    // }
 }
