@@ -36,6 +36,8 @@ class LemogisController
         $chars = $params['chars'];
         $keywords = $params['keywords'];
         $category = $params['category'];
+        $storeInfo = json_decode($request->getAttribute('StoreToken'));
+        $created_by = $storeInfo[1];
         Emogi::create([
             'name' => $name,
             'chars' => $chars,
@@ -43,9 +45,14 @@ class LemogisController
             'category' => $category,
             'date_created' => $this->getDate(),
             'date_modified' => $this->getDate(),
+            'created_by' => $created_by,
         ]);
         return $this->returnJSONResponse($response, 'The new emoji has been created successfully.', 201);
-        // return $response->withJson(['message' => 'The new emoji has been created successfully.'], 201);
+    }
+
+    private function prepareKeywordsArray($keywordString)
+    {
+        $word = trim($keywordString);
     }
 
     public function updateEmogi($request, $response, $args)
@@ -58,7 +65,6 @@ class LemogisController
         $emogi->date_modified = $this->getDate();
         $emogi->update($request->getParsedBody());
         return $this->returnJSONResponse($response, 'The Emogi has been updated successfully.', 200);
-        // return $response->withJson(['message' => 'The Emogi has been updated successfully.'], 200);
     }
 
     public function updateEmogiPart($request, $response, $args)
