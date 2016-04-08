@@ -8,7 +8,7 @@
     ],
 
     "autoload": {
-        "psr-7": {
+        "psr-4": {
             "Elchroy\\Lemogis\\": "src/app/"
         }
     },
