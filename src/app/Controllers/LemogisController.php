@@ -29,6 +29,11 @@ class LemogisController
         // return json_encode($emogi);
     }
 
+    public function one()
+    {
+        return "one";
+    }
+
     public function createEmogi($request, $response, $args)
     {
         $params = $request->getParsedBody();

@@ -17,4 +17,10 @@ class LemogisControllerTest extends PHPUnit_Framework_TestCase
         // var_dump($result);
         $this->assertFalse(false);
     }
+
+    public function testOne()
+    {
+        $result = $this->lemogis->one();
+        $this->assertTrue($result === 'one');
+    }
 }
