@@ -15,9 +15,11 @@ class UsersController
         $username = $data['username'];
         $password = $data['password'];
 
-        if ($this->userExists($username)) {
-            return $this->returnJSONResponse($response, "Username already exists.", 409);
-        }
+        $this->checkIfUserExists($username, $response);
+
+        // if ($this->userExists($username)) {
+        //     return $this->returnJSONResponse($response, "Username already exists.", 409);
+        // }
 
         $this->createUser($username, $password); // Create the new user.
 
@@ -32,9 +34,26 @@ class UsersController
         ]);
     }
 
+    public function checkIfUserDoesNotExist($username, $response)
+    {
+        return !($this->userExists($username)) ? $this->returnJSONResponse($response, "Username does not exist.", 409) : '';
+    }
+
+    public function checkIfUserExists($username, $response)
+    {
+        return $this->userExists($username) ? $this->returnJSONResponse($response, "Username already exists.", 409) : '';
+    }
+
+    public function userHasToken($username)
+    {
+        $user = $this->getUser($username);
+        return $user->tokenID != null ? true : false;
+    }
+
     public function userExists($username)
     {
-        return $this->getUser($username) ? true : false;
+        $user = $this->getUser($username);
+        return $user != null ? true : false;
     }
 
     public function getUser($username)
