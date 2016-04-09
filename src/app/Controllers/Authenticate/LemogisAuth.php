@@ -163,7 +163,6 @@ class LemogisAuth
     private function checkRequestType($request, $response)
     {
         if (!$request->isPost()) {
-            header('HTTP/1.0 405 Method Not Allowed');
             return $this->returnJSONResponse($response, "Method Not Allowed", 405);
         }
     }
