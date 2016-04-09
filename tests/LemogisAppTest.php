@@ -272,12 +272,121 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
-
-
-    private function createToken($username)
+    public function testCheckExpiredToken()
     {
+        $token = $this->createToken('roy', time() - 10000);
+        Emoji::truncate();
+        $this->populateEmoji();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'PUT',
+            'REQUEST_URI' => '/emogis/2',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name' => 'frownie',
+            'chars' => 'f',
+            'keywords' => 'f frown frownie',
+            'category' => 'facial expressions'
+        ]);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Token is Expired. Please re-login.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testForAuthorisationHeader()
+    {
+        Emoji::truncate();
+        $this->populateEmoji();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'PUT',
+            'REQUEST_URI' => '/emogis/2',
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name' => 'frownie',
+            'chars' => 'f',
+            'keywords' => 'f frown frownie',
+            'category' => 'facial expressions'
+        ]);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Bad Request - Token not found in request. Please Login","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+
+    public function testForTokenInAuthorisationHeader()
+    {
+        Emoji::truncate();
+        $this->populateEmoji();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'PUT',
+            'REQUEST_URI' => '/emogis/2',
+            'HTTP_AUTHORIZATION' => '',
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name' => 'frownie',
+            'chars' => 'f',
+            'keywords' => 'f frown frownie',
+            'category' => 'facial expressions'
+        ]);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Please Provide Token From Login","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function tnoestUserIsLoggedOut()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        $user = User::where('username', 'roy')->first();
+        $user->tokenID = 'MTQ2MDI0MjE4MA==';
+        $user->save();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'PUT',
+            'REQUEST_URI' => '/emogis/2',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name' => 'frownie',
+            'chars' => 'f',
+            'keywords' => 'f frown frownie',
+            'category' => 'facial expressions'
+        ]);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Please Re-login.","data":null}l}';
+        $this->assertSame($expected, $result);
+    }
+
+
+    private function createToken($username, $time = null)
+    {
+        $time = $time === null ? (time() - 10) : $time;
         $tokenId = base64_encode('roy');
-        $issuedAt = time() - 10;
+        $issuedAt = $time;
         $notBefore  = $issuedAt + 10;
         $expire     = $notBefore + 2000;
         $secretKey = base64_decode('sampleSecret'); // or get the app key from the config file.

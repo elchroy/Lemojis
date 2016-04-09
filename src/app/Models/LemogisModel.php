@@ -15,10 +15,10 @@ class LemogisModel extends Eloquent
     public $timestamps = [];
 
 
-    public function user()
-    {
-        return $this->belongsTo('User');
-    }
+    // public function user()
+    // {
+    //     return $this->belongsTo('User');
+    // }
 
 }
 
