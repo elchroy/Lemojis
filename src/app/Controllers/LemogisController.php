@@ -25,13 +25,8 @@ class LemogisController
             return $this->returnJSONResponse($response, 'Cannot find the emoji', 404);
         }
 
-        return $this->returnJSONResponse($response, json_encode($emogi), 200);
+        return $this->returnJSONResponse($response, 'OK', 200, $emogi);
         // return json_encode($emogi);
-    }
-
-    public function one()
-    {
-        return "one";
     }
 
     public function createEmogi($request, $response, $args)
