@@ -37,7 +37,7 @@ class LemogisAuth
             return $this->returnJSONResponse($response, "Password Incorrect.", 403);
         }
 
-        $this->saveTokenForLogout('LoggedIn', $username);
+        $this->saveTokenForLogout(NULL, $username);
 
         $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username));
         return $tokenResponse;
@@ -84,21 +84,36 @@ class LemogisAuth
     public function verifyToken($request, $response, $next)
     {
         $this->checkRequestType($request, $response);
-        $this->checkRequestHeader($request, $response);
+
+        if (!($request->hasHeader('authorization'))) {
+            return $this->returnJSONResponse($response, "Bad Request - Token not found in request. Please Login", 400);
+        }
 
         $authHeader = $request->getHeader('authorization')[0];
-        list($jwt) = sscanf($authHeader, '%s');
+        list($token) = sscanf($authHeader, '%s');
 
-        $this->checkTokenIsFound($jwt, $response);
-        $this->checkExpiredToken($jwt, $response);
-        $decodedToken = $this->tryDecodingToken($jwt, $response);
+        if (!$token) {
+            // Check if the token id=s actually found in the header.
+            return $this->returnJSONResponse($response, "Please Provide Token From Login", 400);
+        }
+
+        if ($this->isExpired($token))
+        {
+            return $this->returnJSONResponse($response, "Token is Expired. Please re-login.", 405);
+        }
+
+        $decodedToken = $this->tryDecodingToken($token, $response);
         $username = ($decodedToken->data->username);
+
+        if ($this->controller->userHasToken($username)) {
+            return $this->returnJSONResponse($response, "Please Re-login.", 405);
+        }
 
         $this->checkLoggedOutuser($username, $response);
         $this->controller->checkIfUserDoesNotExist($username, $response);
         $userInfo = $this->controller->getUser($username)->toArray();
 
-        $tokenID = $this->getTokenID($jwt);
+        $tokenID = $this->getTokenID($token);
         $storeToken = json_encode([$tokenID, $username]);
         $request = $request->withAttribute('StoreToken', $storeToken);
         $response = $next($request, $response);
@@ -112,7 +127,6 @@ class LemogisAuth
             return $decodedToken = JWT::decode($token, $secretKey, ['HS512']);
         } catch (Exception $e) {
              // the token was not able to be decoded. This is likely because the signature was not able to be verified (tampered token)
-            header('HTTP/1.0 401 Unauthorized');
             return $this->returnJSONResponse($response, "Unauthorized", 401);
         }
     }
@@ -135,7 +149,6 @@ class LemogisAuth
     private function checkTokenIsFound($token, $response)
     {
         if (!$token) {
-            header('HTTP/1.0 400 Bad Request');
             return $this->returnJSONResponse($response, "Token not found in request", 400);
         }
     }

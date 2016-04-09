@@ -16,8 +16,8 @@ class LemogisUser extends Eloquent
 
     public $timestamps = [];
 
-    public function emogis()
-    {
-        return $this->hasMany('Emogis');
-    }
+    // public function emogis()
+    // {
+    //     return $this->hasMany('Emogis');
+    // }
 }
