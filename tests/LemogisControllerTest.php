@@ -11,16 +11,8 @@ class LemogisControllerTest extends PHPUnit_Framework_TestCase
     {
         $this->lemogis = new LemogisController();
     }
-    public function notestGetEmojis()
+    public function testGetEmojis()
     {
-        // $result = $this->lemogis->getEmogis();
-        // var_dump($result);
         $this->assertFalse(false);
-    }
-
-    public function notestOne()
-    {
-        $result = $this->lemogis->one();
-        $this->assertTrue($result === 'one');
     }
 }

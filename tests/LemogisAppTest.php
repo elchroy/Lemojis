@@ -145,12 +145,11 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $token = $this->createToken('roy');
         // First delete all the entried inside the datatabase;
         Model::truncate();
-        $headerToken = $token;
         $action = new App();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'POST',
             'REQUEST_URI' => '/emogis',
-            'HTTP_AUTHORIZATION' => $headerToken,
+            'HTTP_AUTHORIZATION' => $token,
             'slim.input' => 'username=world',
             ]
         );
@@ -167,6 +166,27 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
 
         $result = ((string) $response->getBody());
         $expected = '{"message":"The new emoji has been created successfully.","data":null}}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testDeleteEmoji()
+    {
+        $token = $this->createToken('roy');
+        Model::truncate();
+        $this->fakePopulate();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'DELETE',
+            'REQUEST_URI' => '/emogis/2',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"The Emogi has been deleted.","data":null}gin.","data":null}';
         $this->assertSame($expected, $result);
     }
 
