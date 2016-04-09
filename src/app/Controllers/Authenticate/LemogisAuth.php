@@ -59,7 +59,7 @@ class LemogisAuth
         $tokenId = base64_encode(time());
         $issuedAt = time();
         $notBefore  = $issuedAt + 10;
-        $expire     = $notBefore + 1000;
+        $expire     = $notBefore + 2000;
         $secretKey = base64_decode('sampleSecret'); // or get the app key from the config file.
         $JWTToken = [
             'iat'  => $issuedAt,
@@ -154,8 +154,9 @@ class LemogisAuth
     private function checkRequestHeader($request, $response)
     {
         if (!($request->hasHeader('authorization'))) {
-            header('HTTP/1.0 400 Bad Request');
-            return $this->returnJSONResponse($response, "Token not found in request", 400);
+            // header('HTTP/1.0 400 Bad Request');
+            $exceptionMessage = $this->returnJSONResponse($response, "Bad Request - Token not found in request", 400);
+            throw new \Exception($exceptionMessage);
         }
     }
 
