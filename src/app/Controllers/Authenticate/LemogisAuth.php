@@ -37,22 +37,11 @@ class LemogisAuth
             return $this->returnJSONResponse($response, "Password Incorrect.", 403);
         }
 
-        // if ($this->isLoggedIn($user)) {
-        //     return $this->returnJSONResponse($response, "Already Logged In.", 403);
-        // }
-
         $this->saveTokenForLogout('LoggedIn', $username);
 
         $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username));
         return $tokenResponse;
     }
-
-    private function isLoggedIn($user)
-    {
-        return $user->tokenID === 'LoggedIn';
-    }
-
-
 
     private function createToken($username)
     {

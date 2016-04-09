@@ -4,7 +4,8 @@ use Slim\Http\Environment;
 use Elchroy\Lemogis\LemogisApp as App;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use Elchroy\Lemogis\Models\LemogisModel as Model;
+use Elchroy\Lemogis\Models\LemogisModel as Emoji;
+use Elchroy\Lemogis\Models\LemogisUser as User;
 use Firebase\JWT\JWT;
 
 class LemogisAppTest extends \PHPUnit_Framework_TestCase {
@@ -17,54 +18,6 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $_SESSION = array();
         $this->app = new App();
         $this->response = new \Slim\Http\Response();
-    }
-
-    // public function request($method, $path, $options = array())
-    // {
-    //     // Capture STDOUT
-    //     ob_start();
-    //     // Prepare a mock environment
-    //     Environment::mock(array_merge(array(
-    //         'REQUEST_METHOD' => $method,
-    //         'PATH_INFO' => $path,
-    //         'SERVER_NAME' => 'slim-test.dev',
-    //     ), $options));
-    //     $app = new App();
-    //     $this->app = $app;
-    //     $this->request = $app->request($);
-    //     $this->response = $app->response();
-    //     // Return STDOUT
-    //     return ob_get_clean();
-    // }
-
-    // public function get($path, $options = array())
-    // {
-    //     $this->request('GET', $path, $options);
-    // }
-
-    // public function testIndex()
-    // {
-    //     $this->get('/');
-    //     $this->assertEquals('200', $this->response->status());
-    // }
-
-    public function notestGetRequestReturnsEcho()
-    {
-        // instantiate action
-        $action = new App();
-
-        // We need a request and response object to invoke the action
-        $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/echo',
-            'QUERY_STRING'=>'foo=bar']
-        );
-        $request = \Slim\Http\Request::createFromEnvironment($environment);
-        $response = new \Slim\Http\Response();
-
-        // run the controller action and test it
-        $response = $action($request, $response, []);
-        $this->assertSame((string)$response->getBody(), '{"foo":"bar"}');
     }
 
     public function testFirstTest()
@@ -84,8 +37,8 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
 
     public function testGetAll()
     {
-        Model::truncate();
-        $this->fakePopulate();
+        Emoji::truncate();
+        $this->populateEmoji();
         $action = new App();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
@@ -102,8 +55,8 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
 
     public function testGetOneEmoji()
     {
-        Model::truncate();
-        $this->fakePopulate();
+        Emoji::truncate();
+        $this->populateEmoji();
         $action = new App();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
@@ -118,9 +71,9 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
-    private function fakePopulate()
+    private function populateEmoji()
     {
-        Model::create([
+        Emoji::create([
             'name' => 'smile',
             'chars' => 's',
             'keywords' => 'smile',
@@ -129,7 +82,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
             'date_modified' => '2016-03-12 17:04:30',
             'created_by' => 'roy',
         ]);
-        Model::create([
+        Emoji::create([
             'name' => 'smiley',
             'chars' => 'sly',
             'keywords' => 'smilely',
@@ -140,11 +93,23 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         ]);
     }
 
+    private function populateUser()
+    {
+        User::create([
+            'username' => 'roy',
+            'password' => password_hash('ceejay', PASSWORD_DEFAULT)
+        ]);
+        User::create([
+            'username' => 'royz',
+            'password' => 'ceejay',
+        ]);
+    }
+
     public function testPostToCreateOneEmoji()
     {
         $token = $this->createToken('roy');
         // First delete all the entried inside the datatabase;
-        Model::truncate();
+        Emoji::truncate();
         $action = new App();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'POST',
@@ -165,15 +130,15 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $response = $action($request, $response);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"The new emoji has been created successfully.","data":null}}';
+        $expected = '{"message":"The new emoji has been created successfully.","data":null}';
         $this->assertSame($expected, $result);
     }
 
     public function testDeleteEmoji()
     {
         $token = $this->createToken('roy');
-        Model::truncate();
-        $this->fakePopulate();
+        Emoji::truncate();
+        $this->populateEmoji();
         $action = new App();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'DELETE',
@@ -186,9 +151,128 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $response = $action($request, $response);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"The Emogi has been deleted.","data":null}gin.","data":null}';
+        $expected = '{"message":"The Emogi has been deleted.","data":null}';
         $this->assertSame($expected, $result);
     }
+
+    public function testDeleteEmojiFailsForNoID()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'DELETE',
+            'REQUEST_URI' => '/emogis/50',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Cannot find the emoji to delete.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testRegister()
+    {
+        $token = $this->createToken('roy');
+        User::truncate();
+        // $this->populateUser();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'POST',
+            'REQUEST_URI' => '/auth/register',
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'username' => 'roy',
+            'password' => 'ceejay',
+        ]);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"New user has been created successfully.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function tebstLogin()
+    {
+        $token = $this->createToken('roy');
+        User::truncate();
+        $this->populateUser();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'POST',
+            'REQUEST_URI' => '/auth/login',
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'username' => 'roy',
+            'password' => 'ceejay',
+        ]);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0NjAyMzQ1MzUsImp0aSI6Ik1UUTJNREl6TkRVek5RPT0iLCJuYmYiOjE0NjAyMzQ1NDUsImV4cCI6MTQ2MDIzNjU0NSwiZGF0YSI6eyJ1c2VybmFtZSI6InJveSJ9fQ.yytzqudJ5Z8LJp-dscVzQutMOOP44DQkBlwHxobVsYT9K4UPWATiqSeqVr3vZBHWprDl7d0RpxFgkLfvd6k1vg"}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function tesnotLogout()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'GET',
+            'REQUEST_URI' => '/auth/logout',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Successfully Logged Out","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testPutUpdates()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        $action = new App();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'PUT',
+            'REQUEST_URI' => '/emogis/2',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name' => 'frownie',
+            'chars' => 'f',
+            'keywords' => 'f frown frownie',
+            'category' => 'facial expressions'
+        ]);
+        $response = new \Slim\Http\Response();
+        $response = $action($request, $response);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"The Emogi has been updated successfully.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+
 
     private function createToken($username)
     {
@@ -213,79 +297,4 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
 
         return $jwt;
     }
-
-
-    // public function testHome() {
-    //     $env = Environment::mock([
-    //             'REQUEST_METHOD' => 'post',
-    //             'REQUEST_URI' => '/',
-    //             'QUERY_STRING' => '',
-    //             'SERVER_NAME' => 'example.com',
-    //             'CONTENT_TYPE' => 'application/json;charset=utf8',
-    //             'CONTENT_LENGTH' => 15
-    //     ]);
-    //     // Environment::mock(array(
-    //     //     'PATH_INFO' => '/'
-    //     // ));
-    //     $response = $this->app->run();
-    //     dd($response);
-    //     // $response = $this->app->invoke();
-
-    //     $this->assertContains('home', $response->getBody());
-    // }
-
-    // public function testHello() {
-    //     Environment::mock(array(
-    //         'PATH_INFO' => '/hello/world'
-    //     ));
-    //     $response = $this->app->invoke();
-
-    //     $this->assertTrue($response->isOk());
-    //     $this->assertContains('hello world', $response->getBody());
-    // }
-
-    // public function testNotFound() {
-    //     Environment::mock(array(
-    //         'PATH_INFO' => '/not-exists'
-    //     ));
-    //     $response = $this->app->invoke();
-
-    //     $this->assertTrue($response->isNotFound());
-    // }
-
-    // public function testLogin() {
-    //     Environment::mock(array(
-    //         'PATH_INFO' => '/login'
-    //     ));
-    //     $response = $this->app->invoke();
-
-    //     $this->assertTrue($response->isRedirect());
-    //     $this->assertEquals('Wrong login', $_SESSION['slim.flash']['error']);
-    //     $this->assertEquals('/', $response->headers()->get('Location'));
-    // }
-
-    // public function testPostLogin() {
-    //     Environment::mock(array(
-    //         'REQUEST_METHOD' => 'POST',
-    //         'PATH_INFO' => '/login',
-    //         'slim.input' => 'login=world'
-    //     ));
-    //     $response = $this->app->invoke();
-
-    //     $this->assertTrue($response->isRedirect());
-    //     $this->assertEquals('Successfully logged in', $_SESSION['slim.flash']['success']);
-    //     $this->assertEquals('/hello/world', $response->headers()->get('Location'));
-    // }
-
-    // public function testGetLogin() {
-    //     Environment::mock(array(
-    //         'PATH_INFO' => '/login',
-    //         'QUERY_STRING' => 'login=world'
-    //     ));
-    //     $response = $this->app->invoke();
-
-    //     $this->assertTrue($response->isRedirect());
-    //     $this->assertEquals('Successfully logged in', $_SESSION['slim.flash']['success']);
-    //     $this->assertEquals('/hello/world', $response->headers()->get('Location'));
-    // }
 }
