@@ -39,14 +39,21 @@ class LemogisAuth
 
         $this->saveTokenForLogout(NULL, $username);
 
-        $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username));
+        if ($request->getAttribute('TokenTime') == NULL) {
+            $tokenTime = time();
+        } else {
+            $tokenTime = $request->getAttribute('TokenTime');
+        }
+
+        $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username, $tokenTime));
         return $tokenResponse;
     }
 
-    private function createToken($username)
+    private function createToken($username, $time = null)
     {
-        $tokenId = base64_encode(time());
-        $issuedAt = time();
+        $time = $time == null ? time() : $time;
+        $tokenId = base64_encode($time);
+        $issuedAt = $time;
         $notBefore  = $issuedAt + 10;
         $expire     = $notBefore + 2000;
         $secretKey = base64_decode('sampleSecret'); // or get the app key from the config file.

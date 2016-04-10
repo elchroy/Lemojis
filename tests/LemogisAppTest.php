@@ -97,11 +97,13 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
     {
         User::create([
             'username' => 'roy',
-            'password' => password_hash('ceejay', PASSWORD_DEFAULT)
+            'password' => password_hash('ceejay', PASSWORD_DEFAULT),
+            'tokenID' => NULL,
         ]);
         User::create([
             'username' => 'royz',
             'password' => 'ceejay',
+            'tokenID' => NULL,
         ]);
     }
 
@@ -110,12 +112,13 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $token = $this->createToken('roy');
         // First delete all the entried inside the datatabase;
         Emoji::truncate();
+        User::truncate();
+        $this->populateUser();
         $action = new App();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'POST',
             'REQUEST_URI' => '/emogis',
             'HTTP_AUTHORIZATION' => $token,
-            'slim.input' => 'username=world',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
@@ -123,7 +126,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $request = $request->withParsedBody([
             'name' => 'smile',
             'chars' => 's',
-            'keywords' => 'smile',
+            'keywords' => 'These are some of the keywords. I,.,)( &*^%96 I realy liked',
             'category' => 'expressions'
         ]);
         $response = new \Slim\Http\Response();
@@ -200,7 +203,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
-    public function tebstLogin()
+    public function testLogin()
     {
         $token = $this->createToken('roy');
         User::truncate();
@@ -216,15 +219,18 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
             'username' => 'roy',
             'password' => 'ceejay',
         ]);
+
+        $request = $request->withAttribute('TokenTime', 1440302375);
+
         $response = new \Slim\Http\Response();
         $response = $action($request, $response);
 
         $result = ((string) $response->getBody());
-        $expected = '{"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0NjAyMzQ1MzUsImp0aSI6Ik1UUTJNREl6TkRVek5RPT0iLCJuYmYiOjE0NjAyMzQ1NDUsImV4cCI6MTQ2MDIzNjU0NSwiZGF0YSI6eyJ1c2VybmFtZSI6InJveSJ9fQ.yytzqudJ5Z8LJp-dscVzQutMOOP44DQkBlwHxobVsYT9K4UPWATiqSeqVr3vZBHWprDl7d0RpxFgkLfvd6k1vg"}';
+        $expected = '{"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0NDAzMDIzNzUsImp0aSI6Ik1UUTBNRE13TWpNM05RPT0iLCJuYmYiOjE0NDAzMDIzODUsImV4cCI6MTQ0MDMwNDM4NSwiZGF0YSI6eyJ1c2VybmFtZSI6InJveSJ9fQ.fr0N3p3QCjfSHtrW5HjodUTAgoP-m8tx-dRkBvsa0YS6FFSYXdi0yRzG1jtgzRjIAs9odwSEq_woBUkQfisysQ"}';
         $this->assertSame($expected, $result);
     }
 
-    public function tesnotLogout()
+    public function testLogout()
     {
         $token = $this->createToken('roy');
         Emoji::truncate();
@@ -250,6 +256,8 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $token = $this->createToken('roy');
         Emoji::truncate();
         $this->populateEmoji();
+        User::truncate();
+        $this->populateUser();
         $action = new App();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'PUT',
@@ -351,7 +359,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
-    public function tnoestUserIsLoggedOut()
+    public function testUserIsLoggedOut()
     {
         $token = $this->createToken('roy');
         Emoji::truncate();
@@ -361,8 +369,8 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $user->save();
         $action = new App();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'PUT',
-            'REQUEST_URI' => '/emogis/2',
+            'REQUEST_METHOD' => 'POST',
+            'REQUEST_URI' => '/emogis',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -377,7 +385,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $response = $action($request, $response);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"Please Re-login.","data":null}l}';
+        $expected = '{"message":"Please Re-login.","data":null}';
         $this->assertSame($expected, $result);
     }
 
