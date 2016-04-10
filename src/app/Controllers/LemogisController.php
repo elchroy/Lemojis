@@ -11,10 +11,13 @@ class LemogisController
 {
     use ReturnJson;
 
-    public function getEmogis()
+    public function getEmogis($request, $response, $args)
     {
         $emogis = Emogi::all();
-        return json_encode($emogis);
+        if ($emogis == null || count($emogis) < 1) {
+            return $this->returnJSONResponse($response, 'There are no emogis loaded. Register and Login to create an emogi.', 404);
+        }
+        return $this->returnJSONResponse($response, 'OK', 200, $emogis);
     }
 
     public function getEmogi($request, $response, $args)
@@ -76,7 +79,13 @@ class LemogisController
     public function updateEmogiPart($request, $response, $args)
     {
         $id = $args['id'];
-        echo "Updating emogi with ID of $id partially...";
+        $emogi = $this->findEmogi($id);
+        if (!$emogi) {
+            return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
+        }
+        $emogi->date_modified = $this->getDate();
+        $emogi->update($request->getParsedBody());
+        return $this->returnJSONResponse($response, 'The Emogi has been updated successfully.', 200);
     }
 
     public function deleteEmogi($request, $response, $args)

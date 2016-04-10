@@ -25,28 +25,28 @@ class LemogisAuth
         $username = $data['username'];
         $password = $data['password'];
 
-        if (!($this->controller->userExists($username))) {
-            return $this->returnJSONResponse($response, "Username does not exist.", 404);
+        if (!($this->isCorrectDetails($username, $password))) {
+            return $this->returnJSONResponse($response, "Incorrect username or password", 404);
         }
 
         $user = $this->controller->getUser($username);
 
-        $userInfo = $user->toArray();
-
-        if (!(password_verify($password, $userInfo['password']))) {
-            return $this->returnJSONResponse($response, "Password Incorrect.", 403);
-        }
-
         $this->saveTokenForLogout(NULL, $username);
 
-        if ($request->getAttribute('TokenTime') == NULL) {
-            $tokenTime = time();
-        } else {
-            $tokenTime = $request->getAttribute('TokenTime');
-        }
+        $tokenTime = ($request->getAttribute('TokenTime') == null) ? time() : $request->getAttribute('TokenTime');
 
         $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username, $tokenTime));
         return $tokenResponse;
+    }
+
+    private function isCorrectDetails($givenusername, $givenPassword)
+    {
+        $user = $this->controller->getUser($givenusername);
+        if ($user == null) {
+            return false;
+        }
+        $userInfo = $user->toArray();
+        return password_verify($givenPassword, $userInfo['password']);
     }
 
     private function createToken($username, $time = null)
@@ -56,7 +56,6 @@ class LemogisAuth
         $issuedAt = $time;
         $notBefore  = $issuedAt + 10;
         $expire     = $notBefore + 2000;
-        $secretKey = base64_decode('sampleSecret'); // or get the app key from the config file.
         $JWTToken = [
             'iat'  => $issuedAt,
             'jti'  => $tokenId,
@@ -65,11 +64,10 @@ class LemogisAuth
             'data' => ['username' => $username],
         ];
 
-        $jwt = JWT::encode(
-            $JWTToken,      //Data to be encoded in the JWT
-            $secretKey, // The signing key
-            'HS512'     // Algorithm used to sign the token, see https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40#section-3
-        );
+        $jd = $this->getDecodeInfo();
+        $secretKey = base64_decode($jd['APP_SECRET']);
+        $signature = $jd['APP_SIGNATURE'];
+        $jwt = JWT::encode( $JWTToken, $secretKey, $signature);
 
         return $jwt;
     }
@@ -90,8 +88,6 @@ class LemogisAuth
     }
     public function verifyToken($request, $response, $next)
     {
-        $this->checkRequestType($request, $response);
-
         if (!($request->hasHeader('authorization'))) {
             return $this->returnJSONResponse($response, "Bad Request - Token not found in request. Please Login", 400);
         }
@@ -100,7 +96,6 @@ class LemogisAuth
         list($token) = sscanf($authHeader, '%s');
 
         if (!$token) {
-            // Check if the token id=s actually found in the header.
             return $this->returnJSONResponse($response, "Please Provide Token From Login", 400);
         }
 
@@ -109,14 +104,18 @@ class LemogisAuth
             return $this->returnJSONResponse($response, "Token is Expired. Please re-login.", 405);
         }
 
-        $decodedToken = $this->tryDecodingToken($token, $response);
+        $jd = $this->getDecodeInfo();
+        $secretKey = base64_decode($jd['APP_SECRET']);
+        $signature = $jd['APP_SIGNATURE'];
+
+        $decodedToken = $this->decodeToken($token);
+
         $username = ($decodedToken->data->username);
 
         if ($this->controller->userHasToken($username)) {
             return $this->returnJSONResponse($response, "Please Re-login.", 405);
         }
 
-        $this->checkLoggedOutuser($username, $response);
         $this->controller->checkIfUserDoesNotExist($username, $response);
         $userInfo = $this->controller->getUser($username)->toArray();
 
@@ -127,53 +126,18 @@ class LemogisAuth
         return $response;
     }
 
-    private function tryDecodingToken($token, $response)
+    private function decodeToken($token)
     {
-        try {
-            $secretKey = base64_decode('sampleSecret');
-            return $decodedToken = JWT::decode($token, $secretKey, ['HS512']);
-        } catch (Exception $e) {
-             // the token was not able to be decoded. This is likely because the signature was not able to be verified (tampered token)
-            return $this->returnJSONResponse($response, "Unauthorized", 401);
-        }
+        $jd = $this->getDecodeInfo();
+        $secretKey = base64_decode($jd['APP_SECRET']);
+        $signature = $jd['APP_SIGNATURE'];
+        return $decodedToken = JWT::decode($token, $secretKey, [$signature]);
     }
 
-    private function checkLoggedOutuser($username, $response)
+    private function getDecodeInfo($path = null)
     {
-        if ($this->controller->userHasToken($username)) {
-            return $this->returnJSONResponse($response, "You have already logged out. Please re-login.", 405);
-        }
-    }
-
-    private function checkExpiredToken($token, $response)
-    {
-        if ($this->isExpired($token))
-        {
-            return $this->returnJSONResponse($response, "Token is Expired. Please re-login.", 405);
-        }
-    }
-
-    private function checkTokenIsFound($token, $response)
-    {
-        if (!$token) {
-            return $this->returnJSONResponse($response, "Token not found in request", 400);
-        }
-    }
-
-    private function checkRequestHeader($request, $response)
-    {
-        if (!($request->hasHeader('authorization'))) {
-            // header('HTTP/1.0 400 Bad Request');
-            $exceptionMessage = $this->returnJSONResponse($response, "Bad Request - Token not found in request", 400);
-            throw new \Exception($exceptionMessage);
-        }
-    }
-
-    private function checkRequestType($request, $response)
-    {
-        if (!$request->isPost()) {
-            return $this->returnJSONResponse($response, "Method Not Allowed", 405);
-        }
+        $path = $path == null ? __DIR__ . '/../../../../public/.jwt' : $path;
+        return parse_ini_file($path);
     }
 
     private function isExpired($token)
