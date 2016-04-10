@@ -11,10 +11,13 @@ class LemogisController
 {
     use ReturnJson;
 
-    public function getEmogis()
+    public function getEmogis($request, $response, $args)
     {
         $emogis = Emogi::all();
-        return json_encode($emogis);
+        if ($emogis == null || count($emogis) < 1) {
+            return $this->returnJSONResponse($response, 'There are no emogis loaded. Register and Login to create an emogi.', 404);
+        }
+        return $this->returnJSONResponse($response, 'OK', 200, $emogis);
     }
 
     public function getEmogi($request, $response, $args)
