@@ -41,7 +41,7 @@ class LemogisController
         Emogi::create([
             'name' => $name,
             'chars' => $chars,
-            'keywords' => $keywords,
+            'keywords' => $this->prepareKeywordsArray($keywords),
             'category' => $category,
             'date_created' => $this->getDate(),
             'date_modified' => $this->getDate(),
@@ -50,9 +50,15 @@ class LemogisController
         return $this->returnJSONResponse($response, 'The new emoji has been created successfully.', 201);
     }
 
-    private function prepareKeywordsArray($keywordString)
+    private function prepareKeywordsArray($words)
     {
-        $word = trim($keywordString);
+        $words = strtolower($words);
+        $words = preg_replace('/[\W]+/', ' ', $words);
+        $words = trim($words);
+        $words = explode(' ', $words);
+        $words = array_unique($words);
+        $result =  json_encode(array_values($words));
+        return $result;
     }
 
     public function updateEmogi($request, $response, $args)
