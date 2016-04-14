@@ -13,6 +13,7 @@ use org\bovigo\vfs\vfsStream;
 class LemogisAppTest extends \PHPUnit_Framework_TestCase {
 
     private $app;
+    private $app2;
     private $response;
     private $root;
     private $configFile1;
@@ -22,7 +23,6 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
     {
         $this->root = vfsStream::setup('home');
         $this->configFile1 = vfsStream::url('home/config.ini');
-        $this->configFile2 = vfsStream::url('home/config2.ini');
         $file = fopen($this->configFile1, 'a');
         $configData1 = [
                     'driver = sqlite',
@@ -33,24 +33,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         }
         fclose($file);
 
-        $file2 = fopen($this->configFile2, 'a');
-        $configData2 = [
-                    'driver = mysql',
-                    'host = localhost',
-                    'database = naija',
-                    'username = root',
-                    'password =',
-                    'charset = utf8',
-                    'collation = utf8_unicode_ci',
-                    'prefix ='
-        ];
-        foreach ($configData2 as $cfg) {
-            fwrite($file2, $cfg."\n");
-        }
-        fclose($file2);
-
         $this->app  = new App(new Connection($this->configFile1));
-        // $this->app2 = new App(new Connection($this->configFile2));
         $this->response = new \Slim\Http\Response();
     }
 
@@ -434,17 +417,38 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
-    public function teNOstConnectionIsFromFile()
+    public function testConnectionIsFromFile()
     {
+        $configFile2 = vfsStream::url('home/config2.ini');
+        $file = fopen($configFile2, 'a');
+        $configData = [
+                    'driver = mysql',
+                    'host = localhost',
+                    'database = naija',
+                    'username = root',
+                    'password =',
+                    'charset = utf8',
+                    'collation = utf8_unicode_ci',
+                    'prefix ='
+        ];
+        foreach ($configData as $cfg) {
+            fwrite($file, $cfg."\n");
+        }
+        fclose($file);
+        $app = new App(new Connection($configFile2));
+
+        $conn = mysqli_connect('127.0.0.1', 'root', '');
+        mysqli_query($conn, 'CREATE DATABASE IF NOT EXISTS elchroy');
+
+
+
+        mysqli_query($conn, 'DROP DATABASE elchroy'); //Destroy the database;
+
         $token = $this->createToken('roy');
-        Emoji::truncate();
-        $this->populateEmoji();
-        User::truncate();
-        $this->populateUser();
+
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'PATCH',
-            'REQUEST_URI' => '/emogis/50',
-            'HTTP_AUTHORIZATION' => $token,
+            'REQUEST_METHOD' => 'GET',
+            'REQUEST_URI' => '/',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
@@ -453,11 +457,10 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
             'keywords' => 'f frown frownie',
         ]);
         $response = new \Slim\Http\Response();
-        $app = $this->app2;
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"Cannot find the emoji to update.","data":null}';
+        $expected = 'Welcome to Lemogi - A Simple Naija Emoji Service.';
         $this->assertSame($expected, $result);
     }
 
