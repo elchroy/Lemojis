@@ -25,17 +25,11 @@ class LemogisAuth
         $username = $data['username'];
         $password = $data['password'];
 
-        if (!($this->controller->userExists($username))) {
-            return $this->returnJSONResponse($response, "Username does not exist.", 404);
+        if (!($this->isCorrectDetails($username, $password))) {
+            return $this->returnJSONResponse($response, "Incorrect username or password", 404);
         }
 
         $user = $this->controller->getUser($username);
-
-        $userInfo = $user->toArray();
-
-        if (!(password_verify($password, $userInfo['password']))) {
-            return $this->returnJSONResponse($response, "Password Incorrect.", 403);
-        }
 
         $this->saveTokenForLogout(NULL, $username);
 
@@ -47,6 +41,16 @@ class LemogisAuth
 
         $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username, $tokenTime));
         return $tokenResponse;
+    }
+
+    private function isCorrectDetails($givenusername, $givenPassword)
+    {
+        $user = $this->controller->getUser($givenusername);
+        if ($user == null) {
+            return false;
+        }
+        $userInfo = $user->toArray();
+        return password_verify($givenPassword, $userInfo['password']);
     }
 
     private function createToken($username, $time = null)
@@ -90,8 +94,6 @@ class LemogisAuth
     }
     public function verifyToken($request, $response, $next)
     {
-        $this->checkRequestType($request, $response);
-
         if (!($request->hasHeader('authorization'))) {
             return $this->returnJSONResponse($response, "Bad Request - Token not found in request. Please Login", 400);
         }
@@ -109,14 +111,20 @@ class LemogisAuth
             return $this->returnJSONResponse($response, "Token is Expired. Please re-login.", 405);
         }
 
-        $decodedToken = $this->tryDecodingToken($token, $response);
+        $decodedToken = $this->decodeToken($token);
+        if ($decodedToken == false) {
+            return $this->returnJSONResponse($response, "Unauthorized", 401);
+        }
         $username = ($decodedToken->data->username);
 
         if ($this->controller->userHasToken($username)) {
             return $this->returnJSONResponse($response, "Please Re-login.", 405);
         }
 
-        $this->checkLoggedOutuser($username, $response);
+        if ($this->controller->userHasToken($username)) {
+            return $this->returnJSONResponse($response, "You have already logged out. Please re-login.", 405);
+        }
+
         $this->controller->checkIfUserDoesNotExist($username, $response);
         $userInfo = $this->controller->getUser($username)->toArray();
 
@@ -127,52 +135,13 @@ class LemogisAuth
         return $response;
     }
 
-    private function tryDecodingToken($token, $response)
+    private function decodeToken($token)
     {
         try {
             $secretKey = base64_decode('sampleSecret');
             return $decodedToken = JWT::decode($token, $secretKey, ['HS512']);
         } catch (Exception $e) {
-             // the token was not able to be decoded. This is likely because the signature was not able to be verified (tampered token)
-            return $this->returnJSONResponse($response, "Unauthorized", 401);
-        }
-    }
-
-    private function checkLoggedOutuser($username, $response)
-    {
-        if ($this->controller->userHasToken($username)) {
-            return $this->returnJSONResponse($response, "You have already logged out. Please re-login.", 405);
-        }
-    }
-
-    private function checkExpiredToken($token, $response)
-    {
-        if ($this->isExpired($token))
-        {
-            return $this->returnJSONResponse($response, "Token is Expired. Please re-login.", 405);
-        }
-    }
-
-    private function checkTokenIsFound($token, $response)
-    {
-        if (!$token) {
-            return $this->returnJSONResponse($response, "Token not found in request", 400);
-        }
-    }
-
-    private function checkRequestHeader($request, $response)
-    {
-        if (!($request->hasHeader('authorization'))) {
-            // header('HTTP/1.0 400 Bad Request');
-            $exceptionMessage = $this->returnJSONResponse($response, "Bad Request - Token not found in request", 400);
-            throw new \Exception($exceptionMessage);
-        }
-    }
-
-    private function checkRequestType($request, $response)
-    {
-        if (!$request->isPost()) {
-            return $this->returnJSONResponse($response, "Method Not Allowed", 405);
+            return false;
         }
     }
 

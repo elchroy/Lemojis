@@ -255,6 +255,32 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
+    public function testLoginFailsForNoUser()
+    {
+        $token = $this->createToken('roy');
+        User::truncate();
+        $this->populateUser();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'POST',
+            'REQUEST_URI' => '/auth/login',
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'username' => 'UnavailableUser',
+            'password' => 'Password',
+        ]);
+
+        $request = $request->withAttribute('TokenTime', 1440302375);
+
+        $response = new \Slim\Http\Response();
+        $response = ($this->app)($request, $response, []);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Incorrect username or password","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
     public function testLogout()
     {
         $token = $this->createToken('roy');
