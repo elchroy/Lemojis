@@ -33,11 +33,7 @@ class LemogisAuth
 
         $this->saveTokenForLogout(NULL, $username);
 
-        if ($request->getAttribute('TokenTime') == NULL) {
-            $tokenTime = time();
-        } else {
-            $tokenTime = $request->getAttribute('TokenTime');
-        }
+        $tokenTime = ($request->getAttribute('TokenTime') == null) ? time() : $request->getAttribute('TokenTime');
 
         $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username, $tokenTime));
         return $tokenResponse;
@@ -121,10 +117,6 @@ class LemogisAuth
             return $this->returnJSONResponse($response, "Please Re-login.", 405);
         }
 
-        if ($this->controller->userHasToken($username)) {
-            return $this->returnJSONResponse($response, "You have already logged out. Please re-login.", 405);
-        }
-
         $this->controller->checkIfUserDoesNotExist($username, $response);
         $userInfo = $this->controller->getUser($username)->toArray();
 
@@ -137,10 +129,12 @@ class LemogisAuth
 
     private function decodeToken($token)
     {
+        $secretKey = base64_decode('sampleSecret');
         try {
-            $secretKey = base64_decode('sampleSecret');
             return $decodedToken = JWT::decode($token, $secretKey, ['HS512']);
         } catch (Exception $e) {
+            echo("hihihihi");
+            die('hihihihihihi');
             return false;
         }
     }

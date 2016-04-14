@@ -142,6 +142,11 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
             'password' => 'ceejay',
             'tokenID' => NULL,
         ]);
+        User::create([
+            'username' => 'royally',
+            'password' => 'ceejay',
+            'tokenID' => 'HasToken',
+        ]);
     }
 
     public function testPostToCreateOneEmoji()
@@ -352,6 +357,34 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'PATCH',
+            'REQUEST_URI' => '/emogis/2',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name' => 'frownie',
+            'keywords' => 'f frown frownie',
+        ]);
+        $response = new \Slim\Http\Response();
+        $app = $this->app;
+        $response = $app($request, $response, []);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"The Emogi has been updated successfully.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testDecodingFails()
+    {
+        $token = $this->createToken('roy');
+        // $token = substr_replace($token,'*',-1);
+        Emoji::truncate();
+        $this->populateEmoji();
+        User::truncate();
+        $this->populateUser();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'PUT',
             'REQUEST_URI' => '/emogis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
