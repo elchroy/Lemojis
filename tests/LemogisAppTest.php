@@ -417,14 +417,45 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
-    public function testConnectionIsFromFile()
+    public function testConnectionClass()
     {
         $configFile2 = vfsStream::url('home/config2.ini');
         $file = fopen($configFile2, 'a');
         $configData = [
                     'driver = mysql',
                     'host = localhost',
-                    'database = naija',
+                    'database = elchroy',
+                    'username = root',
+                    'password =',
+                    'charset = utf8',
+                    'collation = utf8_unicode_ci',
+                    'prefix ='
+        ];
+        foreach ($configData as $cfg) {
+            fwrite($file, $cfg."\n");
+        }
+        fclose($file);
+
+        $expConfigdata = parse_ini_file($configFile2);
+        $conn = new Connection($configFile2);
+        $config = $conn->loadConfiguration($configFile2);
+        // dd($config);
+        $this->assertEquals($config, $expConfigdata);
+    }
+
+    public function tekstConnectionIsFromFile()
+    {
+        $conn = mysqli_connect('127.0.0.1', 'root', '');
+        mysqli_query($conn, 'CREATE DATABASE IF NOT EXISTS elchroy');
+        mysqli_query($conn, 'CREATE TABLE lemogis (id int) IF NOT EXISTS elchroy');
+
+
+        $configFile2 = vfsStream::url('home/config2.ini');
+        $file = fopen($configFile2, 'a');
+        $configData = [
+                    'driver = mysql',
+                    'host = localhost',
+                    'database = elchroy',
                     'username = root',
                     'password =',
                     'charset = utf8',
@@ -437,18 +468,11 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         fclose($file);
         $app = new App(new Connection($configFile2));
 
-        $conn = mysqli_connect('127.0.0.1', 'root', '');
-        mysqli_query($conn, 'CREATE DATABASE IF NOT EXISTS elchroy');
-
-
-
-        mysqli_query($conn, 'DROP DATABASE elchroy'); //Destroy the database;
-
         $token = $this->createToken('roy');
 
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/',
+            'REQUEST_URI' => '/emogis',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
@@ -462,6 +486,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $result = ((string) $response->getBody());
         $expected = 'Welcome to Lemogi - A Simple Naija Emoji Service.';
         $this->assertSame($expected, $result);
+        mysqli_query($conn, 'DROP DATABASE elchroy'); //Destroy the database;
     }
 
     public function testDecodingFails()

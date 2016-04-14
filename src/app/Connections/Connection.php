@@ -24,7 +24,7 @@ class Connection
         $this->connection = $this->capsule->getConnection('default');
     }
 
-    private function loadConfiguration($path = null)
+    public function loadConfiguration($path = null)
     {
         $path = $path == null ? __DIR__ . "/../../../config.ini" : $path;
         $config = parse_ini_file($path);
