@@ -10,8 +10,15 @@ use Elchroy\Lemogis\Connections\Connection;
 
 class LemogisApp extends Slim
 {
+    /**
+     * Public variable to hold some settings for the user.
+     */
     public $config = [];
 
+    /**
+     * Construct the object with the given Connection class, which defaults to null.
+     * @param Connection class object, which defaults to null.
+     */
     public function __construct(Connection $connection = null)
     {
         $connection = $connection == null ? new Connection : $connection;
@@ -23,6 +30,9 @@ class LemogisApp extends Slim
         $this->loadRoutes();
     }
 
+    /**
+     * Load all the routes from the routes file.
+     */
     private function loadRoutes()
     {
         require('Routes/routes.php');

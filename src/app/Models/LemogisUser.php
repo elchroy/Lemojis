@@ -9,15 +9,19 @@ use Elchroy\Lemogis\Models\LemogisUser as User;
 
 class LemogisUser extends Eloquent
 {
-
+    /**
+     * Define the fillable properties of a user.
+     */
     protected $fillable = ['username', 'password'];
 
+    /**
+     * Define the database table for users.
+     */
     public $table = 'users';
 
+    /**
+     * Deactivate timstamps
+     */
     public $timestamps = [];
 
-    // public function emogis()
-    // {
-    //     return $this->hasMany('Emogis');
-    // }
 }

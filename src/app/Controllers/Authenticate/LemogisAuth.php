@@ -10,15 +10,32 @@ use Firebase\JWT\JWT;
 
 class LemogisAuth
 {
+    /**
+     * User the return JSON traits.
+     */
     use ReturnJson;
 
+    /**
+     * Public variable to hold the user controller object.
+     */
     public $controller;
 
+    /**
+     * Constructor to set the public controller as a user controller object.
+     */
     public function __construct()
     {
         $this->controller = new UsersController();
     }
 
+    /**
+     * Login a user. And give him a token.
+     * @param  The slim request object.
+     * @param  The slim response object.
+     * @return Return the JSON encoded token to be assigned to the user.
+     * If the given username does not exist or the given password does not match the username,
+     * a JSON decoded 404 message is returned.
+     */
     public function loginUser($request, $response)
     {
         $data = $request->getParsedBody();
@@ -39,6 +56,13 @@ class LemogisAuth
         return $tokenResponse;
     }
 
+    /**
+     * Private function to check if the given user details are valid.
+     * @param  Username to validate.
+     * @param  Password to validate.
+     *
+     * @return TRUE if all checks are valid. FALSE otherwise.
+     */
     private function isCorrectDetails($givenusername, $givenPassword)
     {
         $user = $this->controller->getUser($givenusername);
@@ -49,6 +73,12 @@ class LemogisAuth
         return password_verify($givenPassword, $userInfo['password']);
     }
 
+    /**
+     * Private function to create a token for the user.
+     * @param  The user's username.
+     * @param  The time to be used to create the token.
+     * @return The created token as a string.
+     */
     private function createToken($username, $time = null)
     {
         $time = $time == null ? time() : $time;
@@ -72,6 +102,12 @@ class LemogisAuth
         return $jwt;
     }
 
+    /**
+     * Log a user out of the Application.
+     * @param  A slim request object.
+     * @param  A slim repsonse object.
+     * @return A JSON decoded 200 message that the user has been logged out.
+     */
     public function logOutUser($request, $response)
     {
         $storeInfo = $request->getAttribute('StoreToken');
@@ -80,14 +116,27 @@ class LemogisAuth
         return $this->returnJSONResponse($response, "Successfully Logged Out", 200);
     }
 
+    /**
+     * Private function to save the token for the user upon looging out of the application.
+     * @param  The token to be save against the user.
+     * @param  The username of the user to log out.
+     */
     private function saveTokenForLogout($token, $username)
     {
         $user = $this->controller->getUser($username);
         $user->tokenID = $token;
         $user->save();
     }
+
+    /**
+     * Verify user status and control access to private routes.
+     * @param  A slim request object.
+     * @param  A slim repsonse object.
+     * @param  The next function to call if the verifications are performed and the user is authorized.
+     */
     public function verifyToken($request, $response, $next)
     {
+        // If there is no authorization header in the request object, the return 400 status json encoded message.
         if (!($request->hasHeader('authorization'))) {
             return $this->returnJSONResponse($response, "Bad Request - Token not found in request. Please Login", 400);
         }
@@ -95,10 +144,16 @@ class LemogisAuth
         $authHeader = $request->getHeader('authorization')[0];
         list($token) = sscanf($authHeader, '%s');
 
+        /**
+         * If there is no token in the authorization header, then return 400 code json encoded message.
+         */
         if (!$token) {
             return $this->returnJSONResponse($response, "Please Provide Token From Login", 400);
         }
 
+        /**
+         * If the token that is in the header is expired, the return a JSON encoded 405 message.
+         */
         if ($this->isExpired($token))
         {
             return $this->returnJSONResponse($response, "Token is Expired. Please re-login.", 405);
@@ -112,6 +167,9 @@ class LemogisAuth
 
         $username = ($decodedToken->data->username);
 
+        /**
+         * If the user already has a token value as one of his properties, then return a message that the user has logged out. The message is JSON encoded.
+         */
         if ($this->controller->userHasToken($username)) {
             return $this->returnJSONResponse($response, "Please Re-login.", 405);
         }
@@ -126,6 +184,12 @@ class LemogisAuth
         return $response;
     }
 
+    /**
+     * Decode the token.
+     * The decoding signatures or secrets are loaded.
+     * @param  The token to be decoded.
+     * @return Return the decoded token.
+     */
     private function decodeToken($token)
     {
         $jd = $this->getDecodeInfo();
@@ -134,28 +198,53 @@ class LemogisAuth
         return $decodedToken = JWT::decode($token, $secretKey, [$signature]);
     }
 
+    /**
+     * The the decoding signatures ot secrets.
+     * @param  The path to the jwt file where the decoding information have been stored.
+     * @return An array containing the decoding keys.
+     */
     private function getDecodeInfo($path = null)
     {
         $path = $path == null ? __DIR__ . '/../../../../public/.jwt' : $path;
         return parse_ini_file($path);
     }
 
+    /**
+     * Check if the token is expired.
+     * @param  The token to be checked.
+     * @return TRUE if teh token is expired. FALSE otherwise.
+     */
     private function isExpired($token)
     {
         return $this->expirationDateOf($token) < time();
     }
 
+    /**
+     * Get the expiration date of the token.
+     * @param  The token whose expiration date is required.
+     * @return The expiration date of the token.
+     */
     private function expirationDateOf($token)
     {
         // Get the expiration date of the token
         return $this->getToken($token)->exp;
     }
 
+    /**
+     * Get the token header.
+     * @param  The token whose header is required.
+     * @return The header of the token.
+     */
     private function getToken($token)
     {
         return json_decode(base64_decode(explode('.', $token)[1]));
     }
 
+    /**
+     * Get the token ID form the token header.
+     * @param  The token whose ID is required.
+     * @return The token ID from header of the token.
+     */
     private function getTokenID($token)
     {
         return $this->getToken($token)->jti;
