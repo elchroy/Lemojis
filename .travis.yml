@@ -4,6 +4,15 @@ php:
   - 5.6
   - 7.0
 
+services:
+    - mysql
+
+before_script:
+    - mysql -e 'create database IF NOT EXISTS naija;'
+
+before_install:
+    - mysql -e "create database IF NOT EXISTS naija;" -uroot
+
 script:
     - mkdir -p build/logs
     - composer install
