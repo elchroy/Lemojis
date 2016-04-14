@@ -20,10 +20,6 @@ class LemogisApp extends Slim
 
         parent::__construct(["settings" => $this->config]);
 
-        $this->db = function () {
-            return new Capsule;
-        };
-
         $this->loadRoutes();
     }
 

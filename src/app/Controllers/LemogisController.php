@@ -79,6 +79,15 @@ class LemogisController
     public function updateEmogiPart($request, $response, $args)
     {
         $id = $args['id'];
+        $emogi = $this->findEmogi($id);
+        if (!$emogi) {
+            return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
+        }
+        $emogi->date_modified = $this->getDate();
+        $emogi->update($request->getParsedBody());
+        return $this->returnJSONResponse($response, 'The Emogi has been updated successfully.', 200);
+
+        $id = $args['id'];
         echo "Updating emogi with ID of $id partially...";
     }
 

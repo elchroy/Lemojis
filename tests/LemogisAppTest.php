@@ -343,6 +343,33 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
+    public function testPatchUpdates()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        User::truncate();
+        $this->populateUser();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'PATCH',
+            'REQUEST_URI' => '/emogis/2',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name' => 'frownie',
+            'keywords' => 'f frown frownie',
+        ]);
+        $response = new \Slim\Http\Response();
+        $app = $this->app;
+        $response = $app($request, $response, []);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"The Emogi has been updated successfully.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
     public function testPutFailsToUpdatesForUnavailableEmogi()
     {
         $token = $this->createToken('roy');
