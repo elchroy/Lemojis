@@ -18,7 +18,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
     {
         $_SESSION = array();
         $configData = ['driver' =>'sqlite', 'host' => 'localhost', 'database' => __DIR__.'/../test.sqlite'];
-        $this->app = new App(new Connection($configData));
+        $this->app = new App(new Elchroy\Lemogis\Connections\Connection($configData));
         $this->response = new \Slim\Http\Response();
     }
 
