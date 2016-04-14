@@ -434,7 +434,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
-    public function testConnectionIsFromFile()
+    public function teNOstConnectionIsFromFile()
     {
         $token = $this->createToken('roy');
         Emoji::truncate();
