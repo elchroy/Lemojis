@@ -1,10 +1,10 @@
 <?php
+
 require 'vendor/autoload.php';
 use Elchroy\Lemogis\LemogisModel;
-
 use Illuminate\Database\Capsule\Manager as Capsule;
 
-$capsule = new Capsule;
+$capsule = new Capsule();
 
 $capsule->addConnection([
     'driver'    => 'mysql',
@@ -17,10 +17,7 @@ $capsule->addConnection([
     'prefix'    => '',
 ]);
 
-
-
 // $config['displayErrorDetails'] = true;
-
 
 // use \Psr\Http\Message\ServerRequestInterface as Request;
 // use \Psr\Http\Message\ResponseInterface as Response;
@@ -34,7 +31,6 @@ $capsule->addConnection([
     // return $response;
 // });
 
-
 // $app->get('/', function ($request, $response, $args) {
 //     $response->write("Welcome to Slim!");
 //     return $response;
@@ -46,15 +42,14 @@ $capsule->addConnection([
 // $app->get('/emojis', "Elchroy\Lemogis\LemogisController:getEmojis");
 
 LemogisModel::create([
-    'name' => "Roy",
-    'chars' => "o",
-    'keywords' => "These are the keywords",
-    'category' => "Categories",
-    'date_created' => date("Y m d H-m-s"),
-    'date_modified' => date("Y m d H-m-s"),
-    'created_by' => "New Person"
+    'name'          => 'Roy',
+    'chars'         => 'o',
+    'keywords'      => 'These are the keywords',
+    'category'      => 'Categories',
+    'date_created'  => date('Y m d H-m-s'),
+    'date_modified' => date('Y m d H-m-s'),
+    'created_by'    => 'New Person',
 
 ]);
-
 
 // $app->run();

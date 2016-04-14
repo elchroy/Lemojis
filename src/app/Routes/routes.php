@@ -12,7 +12,7 @@ $this->group('/emogis', function () {
     $this->get('/{id}', 'Elchroy\Lemogis\Controllers\LemogisController:getEmogi');
 });
 
-/**
+/*
  * Grouped Authenticate-Routes.
  */
 $this->group('/auth', function () {
@@ -26,7 +26,7 @@ $this->group('/auth', function () {
         ->add("Elchroy\Lemogis\Controllers\Authenticate\LemogisAuth:verifyToken");
 });
 
-/**
+/*
  * Grouped Emogis Routes. These routes are only accessible to authenticated users.
  */
 $this->group('/emogis', function () {
@@ -42,11 +42,10 @@ $this->group('/emogis', function () {
 // The Middleware - Action to be called before each route is called.
 ->add("Elchroy\Lemogis\Controllers\Authenticate\LemogisAuth:verifyToken");
 
-
-/**
+/*
  * Route to the homepage.
  */
-$this->get('/', function() {
+$this->get('/', function () {
     // The welcome message for the application.
     echo 'Welcome to Lemogi - A Simple Naija Emoji Service.';
 });
