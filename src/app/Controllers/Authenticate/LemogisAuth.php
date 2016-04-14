@@ -133,8 +133,6 @@ class LemogisAuth
         try {
             return $decodedToken = JWT::decode($token, $secretKey, ['HS512']);
         } catch (Exception $e) {
-            echo("hihihihi");
-            die('hihihihihihi');
             return false;
         }
     }

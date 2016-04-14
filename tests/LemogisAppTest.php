@@ -439,21 +439,19 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $expConfigdata = parse_ini_file($configFile2);
         $conn = new Connection($configFile2);
         $config = $conn->loadConfiguration($configFile2);
-        // dd($config);
         $this->assertEquals($config, $expConfigdata);
     }
 
-    public function tekstConnectionIsFromFile()
+    /**
+     * @expectedException Elchroy\Lemogis\Exceptions\WrongDatabaseDriverException
+     * @expectedExceptionMessage Only SQLite and MySQL database are supported at the moment.
+     */
+    public function testConnectionClassThrowsException()
     {
-        $conn = mysqli_connect('127.0.0.1', 'root', '');
-        mysqli_query($conn, 'CREATE DATABASE IF NOT EXISTS elchroy');
-        mysqli_query($conn, 'CREATE TABLE lemogis (id int) IF NOT EXISTS elchroy');
-
-
         $configFile2 = vfsStream::url('home/config2.ini');
         $file = fopen($configFile2, 'a');
         $configData = [
-                    'driver = mysql',
+                    'driver = WrongDriver',
                     'host = localhost',
                     'database = elchroy',
                     'username = root',
@@ -466,27 +464,10 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
             fwrite($file, $cfg."\n");
         }
         fclose($file);
-        $app = new App(new Connection($configFile2));
 
-        $token = $this->createToken('roy');
-
-        $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/emogis',
-            ]
-        );
-        $request = \Slim\Http\Request::createFromEnvironment($environment);
-        $request = $request->withParsedBody([
-            'name' => 'frownie',
-            'keywords' => 'f frown frownie',
-        ]);
-        $response = new \Slim\Http\Response();
-        $response = $app($request, $response, []);
-
-        $result = ((string) $response->getBody());
-        $expected = 'Welcome to Lemogi - A Simple Naija Emoji Service.';
-        $this->assertSame($expected, $result);
-        mysqli_query($conn, 'DROP DATABASE elchroy'); //Destroy the database;
+        $expConfigdata = parse_ini_file($configFile2);
+        $conn = new Connection($configFile2);
+        $config = $conn->loadConfiguration($configFile2);
     }
 
     public function testDecodingFails()
