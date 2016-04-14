@@ -8,17 +8,49 @@ use Elchroy\Lemogis\Models\LemogisModel as Emoji;
 use Elchroy\Lemogis\Models\LemogisUser as User;
 use Firebase\JWT\JWT;
 use Elchroy\Lemogis\Connections\Connection;
+use org\bovigo\vfs\vfsStream;
 
 class LemogisAppTest extends \PHPUnit_Framework_TestCase {
 
     private $app;
     private $response;
+    private $root;
+    private $configFile1;
+    private $configFile2;
 
     public function setUp()
     {
-        $_SESSION = array();
-        $configData = ['driver' =>'sqlite', 'host' => 'localhost', 'database' => __DIR__.'/../test.sqlite'];
-        $this->app = new App(new Elchroy\Lemogis\Connections\Connection($configData));
+        $this->root = vfsStream::setup('home');
+        $this->configFile1 = vfsStream::url('home/config.ini');
+        $this->configFile2 = vfsStream::url('home/config2.ini');
+        $file = fopen($this->configFile1, 'a');
+        $configData1 = [
+                    'driver = sqlite',
+                    'database = test.sqlite',
+        ];
+        foreach ($configData1 as $cfg) {
+            fwrite($file, $cfg."\n");
+        }
+        fclose($file);
+
+        $file2 = fopen($this->configFile2, 'a');
+        $configData2 = [
+                    'driver = mysql',
+                    'host = localhost',
+                    'database = naija',
+                    'username = root',
+                    'password =',
+                    'charset = utf8',
+                    'collation = utf8_unicode_ci',
+                    'prefix ='
+        ];
+        foreach ($configData2 as $cfg) {
+            fwrite($file2, $cfg."\n");
+        }
+        fclose($file2);
+
+        $this->app  = new App(new Connection($this->configFile1));
+        $this->app2 = new App(new Connection($this->configFile2));
         $this->response = new \Slim\Http\Response();
     }
 
@@ -372,6 +404,60 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
 
         $result = ((string) $response->getBody());
         $expected = '{"message":"The Emogi has been updated successfully.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testPatchUpdatesFails()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        User::truncate();
+        $this->populateUser();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'PATCH',
+            'REQUEST_URI' => '/emogis/50',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name' => 'frownie',
+            'keywords' => 'f frown frownie',
+        ]);
+        $response = new \Slim\Http\Response();
+        $app = $this->app;
+        $response = $app($request, $response, []);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Cannot find the emoji to update.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testConnectionIsFromFile()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        User::truncate();
+        $this->populateUser();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'PATCH',
+            'REQUEST_URI' => '/emogis/50',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name' => 'frownie',
+            'keywords' => 'f frown frownie',
+        ]);
+        $response = new \Slim\Http\Response();
+        $app = $this->app2;
+        $response = $app($request, $response, []);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Cannot find the emoji to update.","data":null}';
         $this->assertSame($expected, $result);
     }
 

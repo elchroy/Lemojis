@@ -9,11 +9,11 @@ class Connection
 {
     public $capsule;
 
-    public function __construct($configData = null)
+    public function __construct($path = null)
     {
         $this->capsule = new Capsule;
 
-        $configData = $configData == null ? $this->loadConfiguration() : $configData;
+        $configData = $this->loadConfiguration($path);
 
         $this->capsule->addConnection($configData);
 
@@ -24,15 +24,16 @@ class Connection
         $this->connection = $this->capsule->getConnection('default');
     }
 
-    private function loadConfiguration()
+    private function loadConfiguration($path = null)
     {
-        $config = parse_ini_file(__DIR__ . "/../../../config.ini");
+        $path = $path == null ? __DIR__ . "/../../../config.ini" : $path;
+        $config = parse_ini_file($path);
         $driver = $config['driver'];
         if ($driver == 'sqlite') {
             return $this->loadforSQLite($config);
         }
         if ($driver == 'mysql') {
-            return $config;
+            return $this->loadforMySQL($config);
         }
         else {
             $errorMessage = "Only SQLite and MySQL database are supported at the moment.";
@@ -42,8 +43,12 @@ class Connection
 
     public function loadforSQLite($config)
     {
-        dd("ihihihih");
         $config['database'] = __DIR__ . '/../../../' . $config['database'];
+        return $config;
+    }
+
+    public function loadforMySQL($config)
+    {
         return $config;
     }
 
