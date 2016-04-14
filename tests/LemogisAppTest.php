@@ -50,7 +50,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         fclose($file2);
 
         $this->app  = new App(new Connection($this->configFile1));
-        $this->app2 = new App(new Connection($this->configFile2));
+        // $this->app2 = new App(new Connection($this->configFile2));
         $this->response = new \Slim\Http\Response();
     }
 
