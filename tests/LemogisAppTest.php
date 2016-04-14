@@ -22,7 +22,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->response = new \Slim\Http\Response();
     }
 
-    public function tnoestFirstTest()
+    public function testFirstTest()
     {
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
@@ -30,7 +30,8 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
-        $response = ($this->app)($request, $response, []);
+        $app = $this->app;
+        $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
         $this->assertSame('Welcome to Lemogi - A Simple Naija Emoji Service.', $result);
