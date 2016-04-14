@@ -2,26 +2,27 @@
 
 namespace Elchroy\Lemogis\Controllers;
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
-use Elchroy\Lemogis\Models\LemogisModel as Emogi;
 use Elchroy\Lemogis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
+use Elchroy\Lemogis\Models\LemogisModel as Emogi;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class LemogisController
 {
-    /**
+    /*
      * Use the trait for the JSON responses.
      */
     use ReturnJson;
 
     /**
      * Get all the emogis inside the databsae.
+     *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument paramter, to handle all the parameters that are passed with the request.
      *
      * @return The returned JSON response with all the emogis after being fetched from the database.
-     * If none is found, then a 404 message is returned.
+     *             If none is found, then a 404 message is returned.
      */
     public function getEmogis($request, $response, $args)
     {
@@ -29,17 +30,19 @@ class LemogisController
         if ($emogis == null || count($emogis) < 1) {
             return $this->returnJSONResponse($response, 'There are no emogis loaded. Register and Login to create an emogi.', 404);
         }
+
         return $this->returnJSONResponse($response, 'OK', 200, $emogis);
     }
 
     /**
      * Get on emogis the database from the database given the id of the emogi.
+     *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument paramter, to handle all the parameters that are passed with the request.
      *
      * @return The returned JSON response with all the emogis after being fetched from the database.
-     * If the emogi isnot found, then a 404 message is returned.
+     *             If the emogi isnot found, then a 404 message is returned.
      */
     public function getEmogi($request, $response, $args)
     {
@@ -55,7 +58,8 @@ class LemogisController
 
     /**
      * Create an emogi and add to the database
-     * Only authenticated users can create an emogi
+     * Only authenticated users can create an emogi.
+     *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument paramter, to handle all the parameters that are passed with the request.
@@ -72,20 +76,22 @@ class LemogisController
         $storeInfo = json_decode($request->getAttribute('StoreToken'));
         $created_by = $storeInfo[1];
         Emogi::create([
-            'name' => $name,
-            'chars' => $chars,
-            'keywords' => $this->prepareKeywordsArray($keywords),
-            'category' => $category,
-            'date_created' => $this->getDate(),
+            'name'          => $name,
+            'chars'         => $chars,
+            'keywords'      => $this->prepareKeywordsArray($keywords),
+            'category'      => $category,
+            'date_created'  => $this->getDate(),
             'date_modified' => $this->getDate(),
-            'created_by' => $created_by,
+            'created_by'    => $created_by,
         ]);
+
         return $this->returnJSONResponse($response, 'The new emoji has been created successfully.', 201);
     }
 
     /**
      * Private function to prepare the keywords as a JSON encoded array.
-     * Only authenticated users can create an emogi
+     * Only authenticated users can create an emogi.
+     *
      * @param  The words as string to be converted into an array.
      *
      * @return The return JSON encoded string after the given words string has been converted to an array.
@@ -97,19 +103,21 @@ class LemogisController
         $words = trim($words);
         $words = explode(' ', $words);
         $words = array_unique($words);
-        $result =  json_encode(array_values($words));
+        $result = json_encode(array_values($words));
+
         return $result;
     }
 
     /**
      * Update an emogi given the ID of the emogi. Only authenticated users can create an emogi.
      * The update information refers to all the properties of the emogi.
+     *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument paramter, to handle all the parameters that are passed with the request.
      *
      * @return A 200 status message that the update has been performed.
-     * If the emogi with the given ID cannot be found, then 404 response message is returned.
+     *           If the emogi with the given ID cannot be found, then 404 response message is returned.
      */
     public function updateEmogi($request, $response, $args)
     {
@@ -120,18 +128,20 @@ class LemogisController
         }
         $emogi->date_modified = $this->getDate();
         $emogi->update($request->getParsedBody());
+
         return $this->returnJSONResponse($response, 'The Emogi has been updated successfully.', 200);
     }
 
     /**
      * Update an emogi in the database, given the ID. Only authenticated users can create an emogi
      * The update information can be only for some properties of the database.
+     *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument parameter, to handle all the parameters that are passed with the request.
      *
      * @return The returned 201 status and message that the partial update has been performed.
-     * If the emogi cannot be found, then a 200 code response message is returned.
+     *             If the emogi cannot be found, then a 200 code response message is returned.
      */
     public function updateEmogiPart($request, $response, $args)
     {
@@ -142,17 +152,19 @@ class LemogisController
         }
         $emogi->date_modified = $this->getDate();
         $emogi->update($request->getParsedBody());
+
         return $this->returnJSONResponse($response, 'The Emogi has been updated successfully.', 200);
     }
 
     /**
-     * Delete an emogi from the database, given the ID. Only authenticated users can delete an emogi
+     * Delete an emogi from the database, given the ID. Only authenticated users can delete an emogi.
+     *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument parameter, to handle all the parameters that are passed with the request.
      *
      * @return The returned 201 status and message that the emogi has been deleted.
-     * If the emogi cannot be found, then a 200 code response message is returned.
+     *             If the emogi cannot be found, then a 200 code response message is returned.
      */
     public function deleteEmogi($request, $response, $args)
     {
@@ -167,7 +179,8 @@ class LemogisController
     }
 
     /**
-     * Private function to find an emogi in the database given an ID
+     * Private function to find an emogi in the database given an ID.
+     *
      * @param The ID of the emogi to find.
      *
      * @return The returned emogi if it found. Otherwise, FALSE is returned.
@@ -175,16 +188,17 @@ class LemogisController
     private function findEmogi($id)
     {
         $em = Emogi::find($id);
+
         return $em ? Emogi::find($id) : false;
     }
 
     /**
      * Return the current date.
+     *
      * @return A new date object.
      */
     private function getDate()
     {
-        return date("Y-m-d H:m:s");
+        return date('Y-m-d H:m:s');
     }
-
 }

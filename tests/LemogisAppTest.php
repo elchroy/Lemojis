@@ -1,17 +1,16 @@
 <?php
 
-use Slim\Http\Environment;
-use Elchroy\Lemogis\LemogisApp as App;
-use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use \Psr\Http\Message\ServerRequestInterface as Request;
+use Elchroy\Lemogis\Connections\Connection;
+use Elchroy\Lemogis\LemogisApp as App;
 use Elchroy\Lemogis\Models\LemogisModel as Emoji;
 use Elchroy\Lemogis\Models\LemogisUser as User;
 use Firebase\JWT\JWT;
-use Elchroy\Lemogis\Connections\Connection;
 use org\bovigo\vfs\vfsStream;
 
-class LemogisAppTest extends \PHPUnit_Framework_TestCase {
-
+class LemogisAppTest extends \PHPUnit_Framework_TestCase
+{
     private $app;
     private $app2;
     private $response;
@@ -33,7 +32,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         }
         fclose($file);
 
-        $this->app  = new App(new Connection($this->configFile1));
+        $this->app = new App(new Connection($this->configFile1));
         $this->response = new \Slim\Http\Response();
     }
 
@@ -41,7 +40,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
     {
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/']
+            'REQUEST_URI'    => '/', ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
@@ -58,7 +57,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/emogis']
+            'REQUEST_URI'    => '/emogis', ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
@@ -75,7 +74,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         Emoji::truncate();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/emogis']
+            'REQUEST_URI'    => '/emogis', ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
@@ -93,7 +92,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/emogis/2']
+            'REQUEST_URI'    => '/emogis/2', ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
@@ -111,7 +110,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/emogis/30']
+            'REQUEST_URI'    => '/emogis/30', ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
@@ -126,22 +125,22 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
     private function populateEmoji()
     {
         Emoji::create([
-            'name' => 'smile',
-            'chars' => 's',
-            'keywords' => 'smile',
-            'category' => 'expressions',
-            'date_created' => '2016-03-12 17:04:18',
+            'name'          => 'smile',
+            'chars'         => 's',
+            'keywords'      => 'smile',
+            'category'      => 'expressions',
+            'date_created'  => '2016-03-12 17:04:18',
             'date_modified' => '2016-03-12 17:04:30',
-            'created_by' => 'roy',
+            'created_by'    => 'roy',
         ]);
         Emoji::create([
-            'name' => 'smiley',
-            'chars' => 'sly',
-            'keywords' => 'smilely',
-            'category' => 'expressions',
-            'date_created' => '2016-02-12 17:04:20',
+            'name'          => 'smiley',
+            'chars'         => 'sly',
+            'keywords'      => 'smilely',
+            'category'      => 'expressions',
+            'date_created'  => '2016-02-12 17:04:20',
             'date_modified' => '2016-02-12 17:05:18',
-            'created_by' => 'roy',
+            'created_by'    => 'roy',
         ]);
     }
 
@@ -150,17 +149,17 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         User::create([
             'username' => 'roy',
             'password' => password_hash('ceejay', PASSWORD_DEFAULT),
-            'tokenID' => NULL,
+            'tokenID'  => null,
         ]);
         User::create([
             'username' => 'royz',
             'password' => 'ceejay',
-            'tokenID' => NULL,
+            'tokenID'  => null,
         ]);
         User::create([
             'username' => 'royally',
             'password' => 'ceejay',
-            'tokenID' => 'HasToken',
+            'tokenID'  => 'HasToken',
         ]);
     }
 
@@ -172,17 +171,17 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         User::truncate();
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'POST',
-            'REQUEST_URI' => '/emogis',
+            'REQUEST_METHOD'     => 'POST',
+            'REQUEST_URI'        => '/emogis',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'smile',
-            'chars' => 's',
+            'name'     => 'smile',
+            'chars'    => 's',
             'keywords' => 'These are some of the keywords. I,.,)( &*^%96 I realy liked',
-            'category' => 'expressions'
+            'category' => 'expressions',
         ]);
         $response = new \Slim\Http\Response();
         $app = $this->app;
@@ -199,8 +198,8 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         Emoji::truncate();
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'DELETE',
-            'REQUEST_URI' => '/emogis/2',
+            'REQUEST_METHOD'     => 'DELETE',
+            'REQUEST_URI'        => '/emogis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -220,8 +219,8 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         Emoji::truncate();
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'DELETE',
-            'REQUEST_URI' => '/emogis/50',
+            'REQUEST_METHOD'     => 'DELETE',
+            'REQUEST_URI'        => '/emogis/50',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -241,7 +240,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         User::truncate();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'POST',
-            'REQUEST_URI' => '/auth/register',
+            'REQUEST_URI'    => '/auth/register',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
@@ -265,7 +264,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'POST',
-            'REQUEST_URI' => '/auth/register',
+            'REQUEST_URI'    => '/auth/register',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
@@ -289,7 +288,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'POST',
-            'REQUEST_URI' => '/auth/login',
+            'REQUEST_URI'    => '/auth/login',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
@@ -316,7 +315,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'POST',
-            'REQUEST_URI' => '/auth/login',
+            'REQUEST_URI'    => '/auth/login',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
@@ -342,8 +341,8 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         Emoji::truncate();
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/auth/logout',
+            'REQUEST_METHOD'     => 'GET',
+            'REQUEST_URI'        => '/auth/logout',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -351,7 +350,6 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $response = new \Slim\Http\Response();
         $app = $this->app;
         $response = $app($request, $response, []);
-
 
         $result = ((string) $response->getBody());
         $expected = '{"message":"Successfully Logged Out","data":null}';
@@ -366,17 +364,17 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         User::truncate();
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'PUT',
-            'REQUEST_URI' => '/emogis/2',
+            'REQUEST_METHOD'     => 'PUT',
+            'REQUEST_URI'        => '/emogis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'frownie',
-            'chars' => 'f',
+            'name'     => 'frownie',
+            'chars'    => 'f',
             'keywords' => 'f frown frownie',
-            'category' => 'facial expressions'
+            'category' => 'facial expressions',
         ]);
         $response = new \Slim\Http\Response();
         $app = $this->app;
@@ -395,14 +393,14 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         User::truncate();
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'PATCH',
-            'REQUEST_URI' => '/emogis/2',
+            'REQUEST_METHOD'     => 'PATCH',
+            'REQUEST_URI'        => '/emogis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'frownie',
+            'name'     => 'frownie',
             'keywords' => 'f frown frownie',
         ]);
         $response = new \Slim\Http\Response();
@@ -422,14 +420,14 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         User::truncate();
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'PATCH',
-            'REQUEST_URI' => '/emogis/50',
+            'REQUEST_METHOD'     => 'PATCH',
+            'REQUEST_URI'        => '/emogis/50',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'frownie',
+            'name'     => 'frownie',
             'keywords' => 'f frown frownie',
         ]);
         $response = new \Slim\Http\Response();
@@ -453,7 +451,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
                     'password =',
                     'charset = utf8',
                     'collation = utf8_unicode_ci',
-                    'prefix ='
+                    'prefix =',
         ];
         foreach ($configData as $cfg) {
             fwrite($file, $cfg."\n");
@@ -482,7 +480,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
                     'password =',
                     'charset = utf8',
                     'collation = utf8_unicode_ci',
-                    'prefix ='
+                    'prefix =',
         ];
         foreach ($configData as $cfg) {
             fwrite($file, $cfg."\n");
@@ -503,14 +501,14 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         User::truncate();
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'PUT',
-            'REQUEST_URI' => '/emogis/2',
+            'REQUEST_METHOD'     => 'PUT',
+            'REQUEST_URI'        => '/emogis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'frownie',
+            'name'     => 'frownie',
             'keywords' => 'f frown frownie',
         ]);
         $response = new \Slim\Http\Response();
@@ -530,17 +528,17 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         User::truncate();
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'PUT',
-            'REQUEST_URI' => '/emogis/55',
+            'REQUEST_METHOD'     => 'PUT',
+            'REQUEST_URI'        => '/emogis/55',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'frownie',
-            'chars' => 'f',
+            'name'     => 'frownie',
+            'chars'    => 'f',
             'keywords' => 'f frown frownie',
-            'category' => 'facial expressions'
+            'category' => 'facial expressions',
         ]);
         $response = new \Slim\Http\Response();
         $app = $this->app;
@@ -557,17 +555,17 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         Emoji::truncate();
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'PUT',
-            'REQUEST_URI' => '/emogis/2',
+            'REQUEST_METHOD'     => 'PUT',
+            'REQUEST_URI'        => '/emogis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'frownie',
-            'chars' => 'f',
+            'name'     => 'frownie',
+            'chars'    => 'f',
             'keywords' => 'f frown frownie',
-            'category' => 'facial expressions'
+            'category' => 'facial expressions',
         ]);
         $response = new \Slim\Http\Response();
         $app = $this->app;
@@ -584,15 +582,15 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'PUT',
-            'REQUEST_URI' => '/emogis/2',
+            'REQUEST_URI'    => '/emogis/2',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'frownie',
-            'chars' => 'f',
+            'name'     => 'frownie',
+            'chars'    => 'f',
             'keywords' => 'f frown frownie',
-            'category' => 'facial expressions'
+            'category' => 'facial expressions',
         ]);
         $response = new \Slim\Http\Response();
         $app = $this->app;
@@ -603,23 +601,22 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
-
     public function testForTokenInAuthorisationHeader()
     {
         Emoji::truncate();
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'PUT',
-            'REQUEST_URI' => '/emogis/2',
+            'REQUEST_METHOD'     => 'PUT',
+            'REQUEST_URI'        => '/emogis/2',
             'HTTP_AUTHORIZATION' => '',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'frownie',
-            'chars' => 'f',
+            'name'     => 'frownie',
+            'chars'    => 'f',
             'keywords' => 'f frown frownie',
-            'category' => 'facial expressions'
+            'category' => 'facial expressions',
         ]);
         $response = new \Slim\Http\Response();
         $app = $this->app;
@@ -639,17 +636,17 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $user->tokenID = 'MTQ2MDI0MjE4MA==';
         $user->save();
         $environment = \Slim\Http\Environment::mock([
-            'REQUEST_METHOD' => 'POST',
-            'REQUEST_URI' => '/emogis',
+            'REQUEST_METHOD'     => 'POST',
+            'REQUEST_URI'        => '/emogis',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $request = $request->withParsedBody([
-            'name' => 'frownie',
-            'chars' => 'f',
+            'name'     => 'frownie',
+            'chars'    => 'f',
             'keywords' => 'f frown frownie',
-            'category' => 'facial expressions'
+            'category' => 'facial expressions',
         ]);
         $response = new \Slim\Http\Response();
         $app = $this->app;
@@ -660,14 +657,13 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
-
     private function createToken($username, $time = null)
     {
         $time = $time === null ? (time() - 10) : $time;
         $tokenId = base64_encode('roy');
         $issuedAt = $time;
-        $notBefore  = $issuedAt + 10;
-        $expire     = $notBefore + 2000;
+        $notBefore = $issuedAt + 10;
+        $expire = $notBefore + 2000;
         $secretKey = base64_decode('sampleSecret'); // or get the app key from the config file.
         $JWTToken = [
             'iat'  => $issuedAt,
