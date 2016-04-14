@@ -258,6 +258,30 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $result);
     }
 
+    public function testRegisterFailsforDuplicateUsers()
+    {
+        $token = $this->createToken('roy');
+        User::truncate();
+        $this->populateUser();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD' => 'POST',
+            'REQUEST_URI' => '/auth/register',
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'username' => 'roy',
+            'password' => 'ceejay',
+        ]);
+        $response = new \Slim\Http\Response();
+        $app = $this->app;
+        $response = $app($request, $response, []);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"Username already exists.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
     public function testLogin()
     {
         $token = $this->createToken('roy');
