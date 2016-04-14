@@ -2,10 +2,8 @@
 
 namespace Elchroy\Lemogis\Models;
 
-use Elchroy\Lemogis\LemogisModel as Emogis;
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Eloquent\Model as Eloquent;
 use Elchroy\Lemogis\Models\LemogisUser as User;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class LemogisUser extends Eloquent
 {
@@ -20,8 +18,7 @@ class LemogisUser extends Eloquent
     public $table = 'users';
 
     /**
-     * Deactivate timstamps
+     * Deactivate timstamps.
      */
     public $timestamps = [];
-
 }

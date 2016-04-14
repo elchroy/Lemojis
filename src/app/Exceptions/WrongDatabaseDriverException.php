@@ -11,6 +11,7 @@ class WrongDatabaseDriverException extends \Exception
 
     /**
      * Construct the message on ocject instantiation and relate to the user.
+     *
      * @param The message to be related as a parameter.
      * Return the message to the user.
      */
