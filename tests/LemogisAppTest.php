@@ -22,7 +22,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase {
         $this->response = new \Slim\Http\Response();
     }
 
-    public function testFirstTest()
+    public function tnoestFirstTest()
     {
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
