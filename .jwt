@@ -1,0 +1,2 @@
+APP_SECRET = sampleSecret
+APP_SIGNATURE = HS512

@@ -98,7 +98,6 @@ class LemogisAuth
         list($token) = sscanf($authHeader, '%s');
 
         if (!$token) {
-            // Check if the token id=s actually found in the header.
             return $this->returnJSONResponse($response, "Please Provide Token From Login", 400);
         }
 
@@ -107,7 +106,11 @@ class LemogisAuth
             return $this->returnJSONResponse($response, "Token is Expired. Please re-login.", 405);
         }
 
-        $decodedToken = $this->decodeToken($token);
+        $jd = $this->getDecodeInfo();
+        $secretKey = base64_decode($jd['APP_SECRET']);
+        $signature = $jd['APP_SIGNATURE'];
+
+        $decodedToken = JWT::decode($token, $secretKey, [$signature]);
         if ($decodedToken == false) {
             return $this->returnJSONResponse($response, "Unauthorized", 401);
         }
@@ -127,14 +130,22 @@ class LemogisAuth
         return $response;
     }
 
-    private function decodeToken($token)
+    private function decodeToken($token, $path = null)
     {
-        $secretKey = base64_decode('sampleSecret');
+        $jd = $this->getDecodeInfo($path);
+        $secretKey = base64_decode($jd['APP_SECRET']);
+        $signature = $jd['APP_SIGNATURE'];
         try {
-            return $decodedToken = JWT::decode($token, $secretKey, ['HS512']);
+            return $decodedToken = JWT::decode($token, $secretKey, [$signature]);
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    private function getDecodeInfo($path = null)
+    {
+        $path = $path == null ? __DIR__ . '/../../../../.jwt' : $path;
+        return $jwtInfo = parse_ini_file($path);
     }
 
     private function isExpired($token)
