@@ -56,7 +56,6 @@ class LemogisAuth
         $issuedAt = $time;
         $notBefore  = $issuedAt + 10;
         $expire     = $notBefore + 2000;
-        $secretKey = base64_decode('sampleSecret'); // or get the app key from the config file.
         $JWTToken = [
             'iat'  => $issuedAt,
             'jti'  => $tokenId,
@@ -65,11 +64,10 @@ class LemogisAuth
             'data' => ['username' => $username],
         ];
 
-        $jwt = JWT::encode(
-            $JWTToken,      //Data to be encoded in the JWT
-            $secretKey, // The signing key
-            'HS512'     // Algorithm used to sign the token, see https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40#section-3
-        );
+        $jd = $this->getDecodeInfo();
+        $secretKey = base64_decode($jd['APP_SECRET']);
+        $signature = $jd['APP_SIGNATURE'];
+        $jwt = JWT::encode( $JWTToken, $secretKey, $signature);
 
         return $jwt;
     }
@@ -110,10 +108,8 @@ class LemogisAuth
         $secretKey = base64_decode($jd['APP_SECRET']);
         $signature = $jd['APP_SIGNATURE'];
 
-        $decodedToken = JWT::decode($token, $secretKey, [$signature]);
-        if ($decodedToken == false) {
-            return $this->returnJSONResponse($response, "Unauthorized", 401);
-        }
+        $decodedToken = $this->decodeToken($token);
+
         $username = ($decodedToken->data->username);
 
         if ($this->controller->userHasToken($username)) {
@@ -130,22 +126,18 @@ class LemogisAuth
         return $response;
     }
 
-    private function decodeToken($token, $path = null)
+    private function decodeToken($token)
     {
-        $jd = $this->getDecodeInfo($path);
+        $jd = $this->getDecodeInfo();
         $secretKey = base64_decode($jd['APP_SECRET']);
         $signature = $jd['APP_SIGNATURE'];
-        try {
-            return $decodedToken = JWT::decode($token, $secretKey, [$signature]);
-        } catch (Exception $e) {
-            return false;
-        }
+        return $decodedToken = JWT::decode($token, $secretKey, [$signature]);
     }
 
     private function getDecodeInfo($path = null)
     {
-        $path = $path == null ? __DIR__ . '/../../../../.jwt' : $path;
-        return $jwtInfo = parse_ini_file($path);
+        $path = $path == null ? __DIR__ . '/../../../../public/.jwt' : $path;
+        return parse_ini_file($path);
     }
 
     private function isExpired($token)
