@@ -86,9 +86,6 @@ class LemogisController
         $emogi->date_modified = $this->getDate();
         $emogi->update($request->getParsedBody());
         return $this->returnJSONResponse($response, 'The Emogi has been updated successfully.', 200);
-
-        $id = $args['id'];
-        echo "Updating emogi with ID of $id partially...";
     }
 
     public function deleteEmogi($request, $response, $args)
