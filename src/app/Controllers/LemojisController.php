@@ -1,13 +1,13 @@
 <?php
 
-namespace Elchroy\Lemogis\Controllers;
+namespace Elchroy\Lemojis\Controllers;
 
-use Elchroy\Lemogis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
-use Elchroy\Lemogis\Models\LemogisModel as Emogi;
+use Elchroy\Lemojis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
+use Elchroy\Lemojis\Models\LemojisModel as emoji;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class LemogisController
+class LemojisController
 {
     /*
      * Use the trait for the JSON responses.
@@ -15,58 +15,58 @@ class LemogisController
     use ReturnJson;
 
     /**
-     * Get all the emogis inside the databsae.
+     * Get all the emojis inside the databsae.
      *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument paramter, to handle all the parameters that are passed with the request.
      *
-     * @return The returned JSON response with all the emogis after being fetched from the database.
+     * @return The returned JSON response with all the emojis after being fetched from the database.
      *             If none is found, then a 404 message is returned.
      */
-    public function getEmogis($request, $response, $args)
+    public function getemojis($request, $response, $args)
     {
-        $emogis = Emogi::all();
-        if ($emogis == null || count($emogis) < 1) {
-            return $this->returnJSONResponse($response, 'There are no emogis loaded. Register and Login to create an emogi.', 404);
+        $emojis = emoji::all();
+        if ($emojis == null || count($emojis) < 1) {
+            return $this->returnJSONResponse($response, 'There are no emojis loaded. Register and Login to create an emoji.', 404);
         }
 
-        return $this->returnJSONResponse($response, 'OK', 200, $emogis);
+        return $this->returnJSONResponse($response, 'OK', 200, $emojis);
     }
 
     /**
-     * Get on emogis the database from the database given the id of the emogi.
+     * Get on emojis the database from the database given the id of the emoji.
      *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument paramter, to handle all the parameters that are passed with the request.
      *
-     * @return The returned JSON response with all the emogis after being fetched from the database.
-     *             If the emogi isnot found, then a 404 message is returned.
+     * @return The returned JSON response with all the emojis after being fetched from the database.
+     *             If the emoji isnot found, then a 404 message is returned.
      */
-    public function getEmogi($request, $response, $args)
+    public function getemoji($request, $response, $args)
     {
         $id = $args['id'];
-        $emogi = $this->findEmogi($id);
-        if (!$emogi) {
+        $emoji = $this->findemoji($id);
+        if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji', 404);
         }
 
-        return $this->returnJSONResponse($response, 'OK', 200, $emogi);
-        // return json_encode($emogi);
+        return $this->returnJSONResponse($response, 'OK', 200, $emoji);
+        // return json_encode($emoji);
     }
 
     /**
-     * Create an emogi and add to the database
-     * Only authenticated users can create an emogi.
+     * Create an emoji and add to the database
+     * Only authenticated users can create an emoji.
      *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument paramter, to handle all the parameters that are passed with the request.
      *
-     * @return The returned 201 status and message that the emogi has been created.
+     * @return The returned 201 status and message that the emoji has been created.
      */
-    public function createEmogi($request, $response, $args)
+    public function createemoji($request, $response, $args)
     {
         $params = $request->getParsedBody();
         $name = $params['name'];
@@ -75,7 +75,7 @@ class LemogisController
         $category = $params['category'];
         $storeInfo = json_decode($request->getAttribute('StoreToken'));
         $created_by = $storeInfo[1];
-        Emogi::create([
+        emoji::create([
             'name'          => $name,
             'chars'         => $chars,
             'keywords'      => $this->prepareKeywordsArray($keywords),
@@ -90,7 +90,7 @@ class LemogisController
 
     /**
      * Private function to prepare the keywords as a JSON encoded array.
-     * Only authenticated users can create an emogi.
+     * Only authenticated users can create an emoji.
      *
      * @param  The words as string to be converted into an array.
      *
@@ -109,31 +109,31 @@ class LemogisController
     }
 
     /**
-     * Update an emogi given the ID of the emogi. Only authenticated users can create an emogi.
-     * The update information refers to all the properties of the emogi.
+     * Update an emoji given the ID of the emoji. Only authenticated users can create an emoji.
+     * The update information refers to all the properties of the emoji.
      *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument paramter, to handle all the parameters that are passed with the request.
      *
      * @return A 200 status message that the update has been performed.
-     *           If the emogi with the given ID cannot be found, then 404 response message is returned.
+     *           If the emoji with the given ID cannot be found, then 404 response message is returned.
      */
-    public function updateEmogi($request, $response, $args)
+    public function updateemoji($request, $response, $args)
     {
         $id = $args['id'];
-        $emogi = $this->findEmogi($id);
-        if (!$emogi) {
+        $emoji = $this->findemoji($id);
+        if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
         }
-        $emogi->date_modified = $this->getDate();
-        $emogi->update($request->getParsedBody());
+        $emoji->date_modified = $this->getDate();
+        $emoji->update($request->getParsedBody());
 
-        return $this->returnJSONResponse($response, 'The Emogi has been updated successfully.', 200);
+        return $this->returnJSONResponse($response, 'The emoji has been updated successfully.', 200);
     }
 
     /**
-     * Update an emogi in the database, given the ID. Only authenticated users can create an emogi
+     * Update an emoji in the database, given the ID. Only authenticated users can create an emoji
      * The update information can be only for some properties of the database.
      *
      * @param  A slim request object.
@@ -141,55 +141,55 @@ class LemogisController
      * @param  The slim argument parameter, to handle all the parameters that are passed with the request.
      *
      * @return The returned 201 status and message that the partial update has been performed.
-     *             If the emogi cannot be found, then a 200 code response message is returned.
+     *             If the emoji cannot be found, then a 200 code response message is returned.
      */
-    public function updateEmogiPart($request, $response, $args)
+    public function updateemojiPart($request, $response, $args)
     {
         $id = $args['id'];
-        $emogi = $this->findEmogi($id);
-        if (!$emogi) {
+        $emoji = $this->findemoji($id);
+        if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
         }
-        $emogi->date_modified = $this->getDate();
-        $emogi->update($request->getParsedBody());
+        $emoji->date_modified = $this->getDate();
+        $emoji->update($request->getParsedBody());
 
-        return $this->returnJSONResponse($response, 'The Emogi has been updated successfully.', 200);
+        return $this->returnJSONResponse($response, 'The emoji has been updated successfully.', 200);
     }
 
     /**
-     * Delete an emogi from the database, given the ID. Only authenticated users can delete an emogi.
+     * Delete an emoji from the database, given the ID. Only authenticated users can delete an emoji.
      *
      * @param  A slim request object.
      * @param  A slim repsonse object.
      * @param  The slim argument parameter, to handle all the parameters that are passed with the request.
      *
-     * @return The returned 201 status and message that the emogi has been deleted.
-     *             If the emogi cannot be found, then a 200 code response message is returned.
+     * @return The returned 201 status and message that the emoji has been deleted.
+     *             If the emoji cannot be found, then a 200 code response message is returned.
      */
-    public function deleteEmogi($request, $response, $args)
+    public function deleteemoji($request, $response, $args)
     {
         $id = $args['id'];
-        $emogi = $this->findEmogi($id);
-        if (!$emogi) {
+        $emoji = $this->findemoji($id);
+        if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji to delete.', 404);
         }
-        Emogi::destroy($id);
+        emoji::destroy($id);
 
-        return $this->returnJSONResponse($response, 'The Emogi has been deleted.', 200);
+        return $this->returnJSONResponse($response, 'The emoji has been deleted.', 200);
     }
 
     /**
-     * Private function to find an emogi in the database given an ID.
+     * Private function to find an emoji in the database given an ID.
      *
-     * @param The ID of the emogi to find.
+     * @param The ID of the emoji to find.
      *
-     * @return The returned emogi if it found. Otherwise, FALSE is returned.
+     * @return The returned emoji if it found. Otherwise, FALSE is returned.
      */
-    private function findEmogi($id)
+    private function findemoji($id)
     {
-        $em = Emogi::find($id);
+        $em = emoji::find($id);
 
-        return $em ? Emogi::find($id) : false;
+        return $em ? emoji::find($id) : false;
     }
 
     /**

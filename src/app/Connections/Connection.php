@@ -1,8 +1,8 @@
 <?php
 
-namespace Elchroy\Lemogis\Connections;
+namespace Elchroy\Lemojis\Connections;
 
-use Elchroy\Lemogis\Exceptions\WrongConfigurationException;
+use Elchroy\Lemojis\Exceptions\WrongConfigurationException;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class Connection

@@ -1,13 +1,13 @@
 <?php
 
-namespace Elchroy\Lemogis\Controllers\Authenticate;
+namespace Elchroy\Lemojis\Controllers\Authenticate;
 
-use Elchroy\Lemogis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
-use Elchroy\Lemogis\Controllers\UsersController;
-use Elchroy\Lemogis\Models\LemogisUser as User;
+use Elchroy\Lemojis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
+use Elchroy\Lemojis\Controllers\UsersController;
+use Elchroy\Lemojis\Models\LemojisUser as User;
 use Firebase\JWT\JWT;
 
-class LemogisAuth
+class LemojisAuth
 {
     /*
      * User the return JSON traits.

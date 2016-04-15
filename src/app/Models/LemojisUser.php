@@ -1,11 +1,11 @@
 <?php
 
-namespace Elchroy\Lemogis\Models;
+namespace Elchroy\Lemojis\Models;
 
-use Elchroy\Lemogis\Models\LemogisUser as User;
+use Elchroy\Lemojis\Models\LemojisUser as User;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class LemogisUser extends Eloquent
+class LemojisUser extends Eloquent
 {
     /**
      * Define the fillable properties of a user.

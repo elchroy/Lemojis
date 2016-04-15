@@ -1,6 +1,6 @@
 <?php
 
-namespace Elchroy\Lemogis\Controllers\Traits;
+namespace Elchroy\Lemojis\Controllers\Traits;
 
 trait ReturnJsonTrait
 {

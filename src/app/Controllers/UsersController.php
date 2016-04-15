@@ -1,9 +1,9 @@
 <?php
 
-namespace Elchroy\Lemogis\Controllers;
+namespace Elchroy\Lemojis\Controllers;
 
-use Elchroy\Lemogis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
-use Elchroy\Lemogis\Models\LemogisUser as User;
+use Elchroy\Lemojis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
+use Elchroy\Lemojis\Models\LemojisUser as User;
 
 class UsersController
 {
