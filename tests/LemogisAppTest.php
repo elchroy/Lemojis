@@ -304,7 +304,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0NDAzMDIzNzUsImp0aSI6Ik1UUTBNRE13TWpNM05RPT0iLCJuYmYiOjE0NDAzMDIzODUsImV4cCI6MTQ0MDMwNDM4NSwiZGF0YSI6eyJ1c2VybmFtZSI6InJveSJ9fQ.fr0N3p3QCjfSHtrW5HjodUTAgoP-m8tx-dRkBvsa0YS6FFSYXdi0yRzG1jtgzRjIAs9odwSEq_woBUkQfisysQ"}';
+        $expected = '{"message":"Logged In Successfully","token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0NDAzMDIzNzUsImp0aSI6Ik1UUTBNRE13TWpNM05RPT0iLCJuYmYiOjE0NDAzMDIzODUsImV4cCI6MTQ0MDMwNDM4NSwiZGF0YSI6eyJ1c2VybmFtZSI6InJveSJ9fQ.fr0N3p3QCjfSHtrW5HjodUTAgoP-m8tx-dRkBvsa0YS6FFSYXdi0yRzG1jtgzRjIAs9odwSEq_woBUkQfisysQ"}';
         $this->assertSame($expected, $result);
     }
 

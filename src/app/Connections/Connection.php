@@ -43,7 +43,7 @@ class Connection
      */
     public function loadConfiguration($path = null)
     {
-        $path = $path == null ? __DIR__.'/../../../config.ini' : $path;
+        $path = $path == null ? __DIR__.'/../../../../../../config.ini' : $path;
         $config = parse_ini_file($path);
         $driver = $config['driver'];
         if ($driver == 'sqlite') {
