@@ -4,6 +4,6 @@
 
 require_once '../vendor/autoload.php';
 
-$app = new Elchroy\Lemogis\LemogisApp();
+$app = new Elchroy\Lemojis\LemojisApp();
 
 $app->run();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Elchroy\Lemogis\Exceptions;
+namespace Elchroy\Lemojis\Exceptions;
 
 class WrongConfigurationException extends \Exception
 {

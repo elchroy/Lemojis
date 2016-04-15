@@ -1,11 +1,11 @@
 <?php
 
-namespace Elchroy\Lemogis;
+namespace Elchroy\Lemojis;
 
-use Elchroy\Lemogis\Connections\Connection;
+use Elchroy\Lemojis\Connections\Connection;
 use Slim\App as Slim;
 
-class LemogisApp extends Slim
+class LemojisApp extends Slim
 {
     /**
      * Public variable to hold some settings for the user.

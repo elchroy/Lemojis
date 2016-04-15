@@ -1,5 +1,5 @@
 {
-    "name": "elchroy/lemogis",
+    "name": "elchroy/lemojis",
     "authors": [
         {
             "name": "andela-celisha-wigwe",
@@ -9,7 +9,7 @@
 
     "autoload": {
         "psr-4": {
-            "Elchroy\\Lemogis\\": "src/app/"
+            "Elchroy\\Lemojis\\": "src/app/"
         }
     },
     "require": {

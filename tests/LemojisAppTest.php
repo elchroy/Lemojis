@@ -2,14 +2,14 @@
 
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Psr\Http\Message\ServerRequestInterface as Request;
-use Elchroy\Lemogis\Connections\Connection;
-use Elchroy\Lemogis\LemogisApp as App;
-use Elchroy\Lemogis\Models\LemogisModel as Emoji;
-use Elchroy\Lemogis\Models\LemogisUser as User;
+use Elchroy\Lemojis\Connections\Connection;
+use Elchroy\Lemojis\LemojisApp as App;
+use Elchroy\Lemojis\Models\LemojisModel as Emoji;
+use Elchroy\Lemojis\Models\LemojisUser as User;
 use Firebase\JWT\JWT;
 use org\bovigo\vfs\vfsStream;
 
-class LemogisAppTest extends \PHPUnit_Framework_TestCase
+class LemojisAppTest extends \PHPUnit_Framework_TestCase
 {
     private $app;
     private $app2;
@@ -48,7 +48,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $this->assertSame('Welcome to Lemogi - A Simple Naija Emoji Service.', $result);
+        $this->assertSame('Welcome to Lemoji - A Simple Naija Emoji Service.', $result);
     }
 
     public function testGetAll()
@@ -57,7 +57,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI'    => '/emogis', ]
+            'REQUEST_URI'    => '/emojis', ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
@@ -69,12 +69,12 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testGetAllReturnsMessageWhenNoEmogiIsFound()
+    public function testGetAllReturnsMessageWhenNoemojiIsFound()
     {
         Emoji::truncate();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI'    => '/emogis', ]
+            'REQUEST_URI'    => '/emojis', ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
@@ -82,7 +82,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"There are no emogis loaded. Register and Login to create an emogi.","data":null}';
+        $expected = '{"message":"There are no emojis loaded. Register and Login to create an emoji.","data":null}';
         $this->assertSame($expected, $result);
     }
 
@@ -92,7 +92,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI'    => '/emogis/2', ]
+            'REQUEST_URI'    => '/emojis/2', ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
@@ -110,7 +110,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI'    => '/emogis/30', ]
+            'REQUEST_URI'    => '/emojis/30', ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
         $response = new \Slim\Http\Response();
@@ -172,7 +172,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'POST',
-            'REQUEST_URI'        => '/emogis',
+            'REQUEST_URI'        => '/emojis',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -199,7 +199,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'DELETE',
-            'REQUEST_URI'        => '/emogis/2',
+            'REQUEST_URI'        => '/emojis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -209,7 +209,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"The Emogi has been deleted.","data":null}';
+        $expected = '{"message":"The emoji has been deleted.","data":null}';
         $this->assertSame($expected, $result);
     }
 
@@ -220,7 +220,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'DELETE',
-            'REQUEST_URI'        => '/emogis/50',
+            'REQUEST_URI'        => '/emojis/50',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -365,7 +365,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'PUT',
-            'REQUEST_URI'        => '/emogis/2',
+            'REQUEST_URI'        => '/emojis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -381,7 +381,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"The Emogi has been updated successfully.","data":null}';
+        $expected = '{"message":"The emoji has been updated successfully.","data":null}';
         $this->assertSame($expected, $result);
     }
 
@@ -394,7 +394,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'PATCH',
-            'REQUEST_URI'        => '/emogis/2',
+            'REQUEST_URI'        => '/emojis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -408,7 +408,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"The Emogi has been updated successfully.","data":null}';
+        $expected = '{"message":"The emoji has been updated successfully.","data":null}';
         $this->assertSame($expected, $result);
     }
 
@@ -421,7 +421,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'PATCH',
-            'REQUEST_URI'        => '/emogis/50',
+            'REQUEST_URI'        => '/emojis/50',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -440,7 +440,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Elchroy\Lemogis\Exceptions\WrongConfigurationException
+     * @expectedException Elchroy\Lemojis\Exceptions\WrongConfigurationException
      * @expectedExceptionMessage Ensure that the config.ini file has been created at the root directory of your application.
      */
     public function testExceptionForNoConfigFile()
@@ -477,7 +477,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Elchroy\Lemogis\Exceptions\WrongConfigurationException
+     * @expectedException Elchroy\Lemojis\Exceptions\WrongConfigurationException
      * @expectedExceptionMessage Only SQLite and MySQL database are supported at the moment.
      */
     public function testConnectionClassThrowsException()
@@ -514,7 +514,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'PUT',
-            'REQUEST_URI'        => '/emogis/2',
+            'REQUEST_URI'        => '/emojis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -528,11 +528,11 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"The Emogi has been updated successfully.","data":null}';
+        $expected = '{"message":"The emoji has been updated successfully.","data":null}';
         $this->assertSame($expected, $result);
     }
 
-    public function testPutFailsToUpdatesForUnavailableEmogi()
+    public function testPutFailsToUpdatesForUnavailableemoji()
     {
         $token = $this->createToken('roy');
         Emoji::truncate();
@@ -541,7 +541,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateUser();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'PUT',
-            'REQUEST_URI'        => '/emogis/55',
+            'REQUEST_URI'        => '/emojis/55',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -568,7 +568,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'PUT',
-            'REQUEST_URI'        => '/emogis/2',
+            'REQUEST_URI'        => '/emojis/2',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );
@@ -594,7 +594,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD' => 'PUT',
-            'REQUEST_URI'    => '/emogis/2',
+            'REQUEST_URI'    => '/emojis/2',
             ]
         );
         $request = \Slim\Http\Request::createFromEnvironment($environment);
@@ -619,7 +619,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->populateEmoji();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'PUT',
-            'REQUEST_URI'        => '/emogis/2',
+            'REQUEST_URI'        => '/emojis/2',
             'HTTP_AUTHORIZATION' => '',
             ]
         );
@@ -649,7 +649,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $user->save();
         $environment = \Slim\Http\Environment::mock([
             'REQUEST_METHOD'     => 'POST',
-            'REQUEST_URI'        => '/emogis',
+            'REQUEST_URI'        => '/emojis',
             'HTTP_AUTHORIZATION' => $token,
             ]
         );

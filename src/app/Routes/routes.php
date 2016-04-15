@@ -5,11 +5,11 @@
  */
 
 /**
- * Get all emogis or one emogis given its ID.
+ * Get all emojis or one emojis given its ID.
  */
-$this->group('/emogis', function () {
-    $this->get('', 'Elchroy\Lemogis\Controllers\LemogisController:getEmogis');
-    $this->get('/{id}', 'Elchroy\Lemogis\Controllers\LemogisController:getEmogi');
+$this->group('/emojis', function () {
+    $this->get('', 'Elchroy\Lemojis\Controllers\LemojisController:getemojis');
+    $this->get('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:getemoji');
 });
 
 /*
@@ -17,35 +17,35 @@ $this->group('/emogis', function () {
  */
 $this->group('/auth', function () {
     // Register route to register a user.
-    $this->post('/register', 'Elchroy\Lemogis\Controllers\UsersController:registerUser');
+    $this->post('/register', 'Elchroy\Lemojis\Controllers\UsersController:registerUser');
     // Login route to login the user.
-    $this->post('/login', 'Elchroy\Lemogis\Controllers\Authenticate\LemogisAuth:loginUser');
+    $this->post('/login', 'Elchroy\Lemojis\Controllers\Authenticate\LemojisAuth:loginUser');
     // Logout a user. Only authenticateed user can access this route.
-    $this->get('/logout', 'Elchroy\Lemogis\Controllers\Authenticate\LemogisAuth:logOutUser')
+    $this->get('/logout', 'Elchroy\Lemojis\Controllers\Authenticate\LemojisAuth:logOutUser')
         // The Middleware - Action to be called before each route is called.
-        ->add("Elchroy\Lemogis\Controllers\Authenticate\LemogisAuth:verifyToken");
+        ->add("Elchroy\Lemojis\Controllers\Authenticate\LemojisAuth:verifyToken");
 });
 
 /*
- * Grouped Emogis Routes. These routes are only accessible to authenticated users.
+ * Grouped emojis Routes. These routes are only accessible to authenticated users.
  */
-$this->group('/emogis', function () {
-    // Post route to create an Emogi.
-    $this->post('', 'Elchroy\Lemogis\Controllers\LemogisController:createEmogi');
-    // Put route to update all the details of an emogi.
-    $this->put('/{id}', 'Elchroy\Lemogis\Controllers\LemogisController:updateEmogi');
-    // Path route to update only some parts of an emogi.
-    $this->patch('/{id}', 'Elchroy\Lemogis\Controllers\LemogisController:updateEmogiPart');
-    // Delete route to delete an emogi from the database.
-    $this->delete('/{id}', 'Elchroy\Lemogis\Controllers\LemogisController:deleteEmogi');
+$this->group('/emojis', function () {
+    // Post route to create an emoji.
+    $this->post('', 'Elchroy\Lemojis\Controllers\LemojisController:createemoji');
+    // Put route to update all the details of an emoji.
+    $this->put('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:updateemoji');
+    // Path route to update only some parts of an emoji.
+    $this->patch('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:updateemojiPart');
+    // Delete route to delete an emoji from the database.
+    $this->delete('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:deleteemoji');
 })
 // The Middleware - Action to be called before each route is called.
-->add("Elchroy\Lemogis\Controllers\Authenticate\LemogisAuth:verifyToken");
+->add("Elchroy\Lemojis\Controllers\Authenticate\LemojisAuth:verifyToken");
 
 /*
  * Route to the homepage.
  */
 $this->get('/', function () {
     // The welcome message for the application.
-    echo 'Welcome to Lemogi - A Simple Naija Emoji Service.';
+    echo 'Welcome to Lemoji - A Simple Naija Emoji Service.';
 });
