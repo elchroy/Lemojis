@@ -439,6 +439,18 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * @expectedException Elchroy\Lemogis\Exceptions\WrongConfigurationException
+     * @expectedExceptionMessage Ensure that the config.ini file has been created at the root directory of your application.
+     */
+    public function testExceptionForNoConfigFile()
+    {
+        $UnavailableConfigFile = '';
+        $conn = new Connection($UnavailableConfigFile);
+        $config = $conn->loadConfiguration($UnavailableConfigFile);
+        // $this->assertEquals($config, $expConfigdata);
+    }
+
     public function testConnectionClass()
     {
         $configFile2 = vfsStream::url('home/config2.ini');
@@ -465,7 +477,7 @@ class LemogisAppTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Elchroy\Lemogis\Exceptions\WrongDatabaseDriverException
+     * @expectedException Elchroy\Lemogis\Exceptions\WrongConfigurationException
      * @expectedExceptionMessage Only SQLite and MySQL database are supported at the moment.
      */
     public function testConnectionClassThrowsException()

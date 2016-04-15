@@ -40,7 +40,22 @@ prefix      =
 
 ### Usage
 
-CD into the public directory and run your server. You can run the server using PHP from terminal like so:
+Create an `index.php` file, preferrable from the root of your application and run your server.
+
+```PHP
+// index.php
+
+// Require the autoload the vendor folder.
+require_once 'vendor/autoload.php';
+
+// Make a new instance of the application.
+$app = new Elchroy\Lemogis\LemogisApp();
+
+// Run the application.
+$app->run();
+```
+
+You can run the server using PHP from terminal like so:
 ```
 php -S localhost:8000
 

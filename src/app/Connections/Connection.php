@@ -2,7 +2,7 @@
 
 namespace Elchroy\Lemogis\Connections;
 
-use Elchroy\Lemogis\Exceptions\WrongDatabaseDriverException;
+use Elchroy\Lemogis\Exceptions\WrongConfigurationException;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class Connection
@@ -44,7 +44,10 @@ class Connection
     public function loadConfiguration($path = null)
     {
         $path = $path == null ? __DIR__.'/../../../../../../config.ini' : $path;
-        $config = parse_ini_file($path);
+        $config = @parse_ini_file($path);
+        if ($config == false ) {
+            throw new WrongConfigurationException("Ensure that the config.ini file has been created at the root directory of your application.");
+        }
         $driver = $config['driver'];
         if ($driver == 'sqlite') {
             return $this->loadforSQLite($config);
@@ -53,7 +56,7 @@ class Connection
             return $this->loadforMySQL($config);
         } else {
             $errorMessage = 'Only SQLite and MySQL database are supported at the moment.';
-            throw new WrongDatabaseDriverException($errorMessage);
+            throw new WrongConfigurationException($errorMessage);
         }
     }
 
