@@ -2,7 +2,7 @@
 
 namespace Elchroy\Lemogis\Exceptions;
 
-class WrongDatabaseDriverException extends \Exception
+class WrongConfigurationException extends \Exception
 {
     /**
      * Public variable to hold the message to be related to the user.
