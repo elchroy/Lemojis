@@ -30,6 +30,9 @@ class LemojisController
         if ($emojis == null || count($emojis) < 1) {
             return $this->returnJSONResponse($response, 'There are no emojis loaded. Register and Login to create an emoji.', 404);
         }
+        foreach ($emojis as $emoji) {
+            $emoji->keywords = json_decode($emoji->keywords);
+        }
 
         return $this->returnJSONResponse($response, 'OK', 200, $emojis);
     }
@@ -51,6 +54,7 @@ class LemojisController
         if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji', 404);
         }
+        $emoji->keywords = json_decode($emoji->keywords);
 
         return $this->returnJSONResponse($response, 'OK', 200, $emoji);
         // return json_encode($emoji);

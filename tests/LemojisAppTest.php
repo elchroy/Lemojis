@@ -65,7 +65,7 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"OK","data":[{"id":1,"name":"smile","chars":"s","keywords":"smile","category":"expressions","date_created":"2016-03-12 17:04:18","date_modified":"2016-03-12 17:04:30","created_by":"roy"},{"id":2,"name":"smiley","chars":"sly","keywords":"smilely","category":"expressions","date_created":"2016-02-12 17:04:20","date_modified":"2016-02-12 17:05:18","created_by":"roy"}]}';
+        $expected = '{"message":"OK","data":[{"id":1,"name":"smile","chars":"s","keywords":["these","are","not","theonly","some","of","the","keywords","i","96","realy","liked"],"category":"expressions","date_created":"2016-03-12 17:04:18","date_modified":"2016-03-12 17:04:30","created_by":"roy"},{"id":2,"name":"smiley","chars":"sly","keywords":["these","are","some","of","the","keywords","i","96","realy","liked"],"category":"expressions","date_created":"2016-02-12 17:04:20","date_modified":"2016-02-12 17:05:18","created_by":"roy"}]}';
         $this->assertSame($expected, $result);
     }
 
@@ -100,7 +100,7 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"OK","data":{"id":2,"name":"smiley","chars":"sly","keywords":"smilely","category":"expressions","date_created":"2016-02-12 17:04:20","date_modified":"2016-02-12 17:05:18","created_by":"roy"}}';
+        $expected = '{"message":"OK","data":{"id":2,"name":"smiley","chars":"sly","keywords":["these","are","some","of","the","keywords","i","96","realy","liked"],"category":"expressions","date_created":"2016-02-12 17:04:20","date_modified":"2016-02-12 17:05:18","created_by":"roy"}}';
         $this->assertSame($expected, $result);
     }
 
@@ -127,7 +127,7 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
         Emoji::create([
             'name'          => 'smile',
             'chars'         => 's',
-            'keywords'      => 'smile',
+            'keywords'      => json_encode(["these","are","not","theonly","some","of","the","keywords","i","96","realy","liked"]),
             'category'      => 'expressions',
             'date_created'  => '2016-03-12 17:04:18',
             'date_modified' => '2016-03-12 17:04:30',
@@ -136,7 +136,7 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
         Emoji::create([
             'name'          => 'smiley',
             'chars'         => 'sly',
-            'keywords'      => 'smilely',
+            'keywords'      => json_encode(["these","are","some","of","the","keywords","i","96","realy","liked"]),
             'category'      => 'expressions',
             'date_created'  => '2016-02-12 17:04:20',
             'date_modified' => '2016-02-12 17:05:18',
