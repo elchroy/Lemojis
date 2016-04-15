@@ -53,9 +53,9 @@ class LemogisAuth
 
         $tokenTime = ($request->getAttribute('TokenTime') == null) ? time() : $request->getAttribute('TokenTime');
 
-        $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username, $tokenTime));
+        $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username, $tokenTime), 'Logged In Successfully', 200);
 
-        return $tokenResponse;
+        return $tokenResponse;#.'Edit this message and return a json enhanced message';
     }
 
     /**

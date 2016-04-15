@@ -27,8 +27,8 @@ trait ReturnJsonTrait
      *
      * @return The returned JSON response.
      */
-    public function returnJSONTokenResponse($response, $token)
+    public function returnJSONTokenResponse($response, $token, $message = null, $code = null)
     {
-        return $response->withJson(['token' => $token]);
+        return $response->withJson(['message' => $message, 'token' => $token], $code);
     }
 }
