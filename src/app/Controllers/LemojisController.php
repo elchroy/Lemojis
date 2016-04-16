@@ -130,10 +130,29 @@ class LemojisController
         if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
         }
+        if (!($this->isUsersEmoji($request, $emoji))) {
+            return $this->returnJSONResponse($response, 'You can only update your own emoji.', 405);
+        }
+
         $emoji->date_modified = $this->getDate();
         $emoji->update($request->getParsedBody());
 
         return $this->returnJSONResponse($response, 'The emoji has been updated successfully.', 200);
+    }
+
+    /**
+     * Check if the user is the owner of the requested emoji.
+     *
+     * @param  The slim request object.
+     * @param  The emoji to be checked against the user.
+     *
+     * @return TRUE if the user is the owner of the emoji. FALSE otherwise.
+     */
+    private function isUsersEmoji($request, $emoji)
+    {
+        $username = $request->getAttribute('LoggedUser');
+        $owner = $emoji->created_by;
+        return $owner == $username;
     }
 
     /**
@@ -154,6 +173,10 @@ class LemojisController
         if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
         }
+        if (!($this->isUsersEmoji($request, $emoji))) {
+            return $this->returnJSONResponse($response, 'You can only update your own emoji.', 405);
+        }
+
         $emoji->date_modified = $this->getDate();
         $emoji->update($request->getParsedBody());
 
@@ -177,6 +200,10 @@ class LemojisController
         if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji to delete.', 404);
         }
+        if (!($this->isUsersEmoji($request, $emoji))) {
+            return $this->returnJSONResponse($response, 'You can only update your own emoji.', 405);
+        }
+
         emoji::destroy($id);
 
         return $this->returnJSONResponse($response, 'The emoji has been deleted.', 200);
