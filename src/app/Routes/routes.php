@@ -8,8 +8,8 @@
  * Get all emojis or one emojis given its ID.
  */
 $this->group('/emojis', function () {
-    $this->get('', 'Elchroy\Lemojis\Controllers\LemojisController:getemojis');
-    $this->get('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:getemoji');
+    $this->get('', 'Elchroy\Lemojis\Controllers\LemojisController:getEmojis');
+    $this->get('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:getEmoji');
 });
 
 /*
@@ -31,13 +31,13 @@ $this->group('/auth', function () {
  */
 $this->group('/emojis', function () {
     // Post route to create an emoji.
-    $this->post('', 'Elchroy\Lemojis\Controllers\LemojisController:createemoji');
+    $this->post('', 'Elchroy\Lemojis\Controllers\LemojisController:createEmoji');
     // Put route to update all the details of an emoji.
-    $this->put('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:updateemoji');
+    $this->put('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:updateEmoji');
     // Path route to update only some parts of an emoji.
-    $this->patch('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:updateemojiPart');
+    $this->patch('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:updateEmojiPart');
     // Delete route to delete an emoji from the database.
-    $this->delete('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:deleteemoji');
+    $this->delete('/{id}', 'Elchroy\Lemojis\Controllers\LemojisController:deleteEmoji');
 })
 // The Middleware - Action to be called before each route is called.
 ->add("Elchroy\Lemojis\Controllers\Authenticate\LemojisAuth:verifyToken");
