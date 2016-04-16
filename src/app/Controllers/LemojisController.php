@@ -3,7 +3,7 @@
 namespace Elchroy\Lemojis\Controllers;
 
 use Elchroy\Lemojis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
-use Elchroy\Lemojis\Models\LemojisModel as emoji;
+use Elchroy\Lemojis\Models\LemojisModel as Emoji;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -24,9 +24,9 @@ class LemojisController
      * @return The returned JSON response with all the emojis after being fetched from the database.
      *             If none is found, then a 404 message is returned.
      */
-    public function getemojis($request, $response, $args)
+    public function getEmojis($request, $response, $args)
     {
-        $emojis = emoji::all();
+        $emojis = Emoji::all();
         if ($emojis == null || count($emojis) < 1) {
             return $this->returnJSONResponse($response, 'There are no emojis loaded. Register and Login to create an emoji.', 404);
         }
@@ -47,10 +47,10 @@ class LemojisController
      * @return The returned JSON response with all the emojis after being fetched from the database.
      *             If the emoji isnot found, then a 404 message is returned.
      */
-    public function getemoji($request, $response, $args)
+    public function getEmoji($request, $response, $args)
     {
         $id = $args['id'];
-        $emoji = $this->findemoji($id);
+        $emoji = $this->findEmoji($id);
         if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji', 404);
         }
@@ -70,7 +70,7 @@ class LemojisController
      *
      * @return The returned 201 status and message that the emoji has been created.
      */
-    public function createemoji($request, $response, $args)
+    public function createEmoji($request, $response, $args)
     {
         $params = $request->getParsedBody();
         $name = $params['name'];
@@ -79,7 +79,7 @@ class LemojisController
         $category = $params['category'];
         $storeInfo = json_decode($request->getAttribute('StoreToken'));
         $created_by = $storeInfo[1];
-        emoji::create([
+        Emoji::create([
             'name'          => $name,
             'chars'         => $chars,
             'keywords'      => $this->prepareKeywordsArray($keywords),
@@ -123,10 +123,10 @@ class LemojisController
      * @return A 200 status message that the update has been performed.
      *           If the emoji with the given ID cannot be found, then 404 response message is returned.
      */
-    public function updateemoji($request, $response, $args)
+    public function updateEmoji($request, $response, $args)
     {
         $id = $args['id'];
-        $emoji = $this->findemoji($id);
+        $emoji = $this->findEmoji($id);
         if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
         }
@@ -166,10 +166,10 @@ class LemojisController
      * @return The returned 201 status and message that the partial update has been performed.
      *             If the emoji cannot be found, then a 200 code response message is returned.
      */
-    public function updateemojiPart($request, $response, $args)
+    public function updateEmojiPart($request, $response, $args)
     {
         $id = $args['id'];
-        $emoji = $this->findemoji($id);
+        $emoji = $this->findEmoji($id);
         if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
         }
@@ -193,10 +193,10 @@ class LemojisController
      * @return The returned 201 status and message that the emoji has been deleted.
      *             If the emoji cannot be found, then a 200 code response message is returned.
      */
-    public function deleteemoji($request, $response, $args)
+    public function deleteEmoji($request, $response, $args)
     {
         $id = $args['id'];
-        $emoji = $this->findemoji($id);
+        $emoji = $this->findEmoji($id);
         if (!$emoji) {
             return $this->returnJSONResponse($response, 'Cannot find the emoji to delete.', 404);
         }
@@ -204,7 +204,7 @@ class LemojisController
             return $this->returnJSONResponse($response, 'You can only update your own emoji.', 401);
         }
 
-        emoji::destroy($id);
+        Emoji::destroy($id);
 
         return $this->returnJSONResponse($response, 'The emoji has been deleted.', 200);
     }
@@ -218,9 +218,9 @@ class LemojisController
      */
     private function findemoji($id)
     {
-        $em = emoji::find($id);
+        $em = Emoji::find($id);
 
-        return $em ? emoji::find($id) : false;
+        return $em ? Emoji::find($id) : false;
     }
 
     /**
