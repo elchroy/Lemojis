@@ -160,14 +160,14 @@ class LemojisAuth
          * If there is no token in the authorization header, then return 400 code json encoded message.
          */
         if (!$token) {
-            return $this->returnJSONResponse($response, 'Please Provide Token From Login', 400);
+            return $this->returnJSONResponse($response, 'Please Provide Token From Login', 404);
         }
 
         /*
          * If the token that is in the header is expired, the return a JSON encoded 405 message.
          */
         if ($this->isExpired($token)) {
-            return $this->returnJSONResponse($response, 'Token is Expired. Please re-login.', 405);
+            return $this->returnJSONResponse($response, 'Token is Expired. Please re-login.', 401);
         }
 
         $jd = $this->getDecodeInfo();
@@ -185,7 +185,7 @@ class LemojisAuth
          * If the user already has a token value as one of his properties, then return a message that the user has logged out. The message is JSON encoded.
          */
         if ($this->controller->userHasToken($username)) {
-            return $this->returnJSONResponse($response, 'Please Re-login.', 405);
+            return $this->returnJSONResponse($response, 'Please Re-login.', 401);
         }
 
         $this->controller->checkIfUserDoesNotExist($username, $response);

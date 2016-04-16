@@ -131,7 +131,7 @@ class LemojisController
             return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
         }
         if (!($this->isUsersEmoji($request, $emoji))) {
-            return $this->returnJSONResponse($response, 'You can only update your own emoji.', 405);
+            return $this->returnJSONResponse($response, 'You can only update your own emoji.', 401);
         }
 
         $emoji->date_modified = $this->getDate();
@@ -174,7 +174,7 @@ class LemojisController
             return $this->returnJSONResponse($response, 'Cannot find the emoji to update.', 404);
         }
         if (!($this->isUsersEmoji($request, $emoji))) {
-            return $this->returnJSONResponse($response, 'You can only update your own emoji.', 405);
+            return $this->returnJSONResponse($response, 'You can only update your own emoji.', 401);
         }
 
         $emoji->date_modified = $this->getDate();
@@ -201,7 +201,7 @@ class LemojisController
             return $this->returnJSONResponse($response, 'Cannot find the emoji to delete.', 404);
         }
         if (!($this->isUsersEmoji($request, $emoji))) {
-            return $this->returnJSONResponse($response, 'You can only update your own emoji.', 405);
+            return $this->returnJSONResponse($response, 'You can only update your own emoji.', 401);
         }
 
         emoji::destroy($id);
