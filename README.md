@@ -305,7 +305,7 @@ curl -i -X DELETE -H 'Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYX
 Response:
 
 ```
-HTTP/1.1 404 OK
+HTTP/1.1 404 Not Found
 Host: localhost:8000
 Connection: close
 X-Powered-By: PHP/7.0.2
@@ -355,6 +355,27 @@ Content-Type: application/json;charset=utf-8
 Content-Length: 80
 
 {"message":"Token is Expired. Please re-login.","data":null}
+```
+
+#### Logout
+
+Only users that have already logged in can logout.
+
+```
+curl -i -X GET -H 'Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE0NjA3MjYzNzIsImp0aSI6Ik1UUTJNRGN5TmpNM01nPT0iLCJuYmYiOjE0NjA3MjYzODIsImV4cCI6MTQ2MDcyODM4MiwiZGF0YSI6eyJ1c2VybmFtZSI6ImVsY2hyb3kifX0.z22I-1QZwolyVKxE7UwoBUx0UmUJ4qd-ueRMPgNA50WhDCUHGYLFa1Kfw7mQss2SUJoGE5LPAKj_Kk6fkKvMdw' http://localhost:8000/auth/logout
+```
+
+Response:
+
+```
+HTTP/1.1 200 OK
+Host: localhost:8000
+Connection: close
+X-Powered-By: PHP/7.0.2
+Content-Type: application/json;charset=utf-8
+Content-Length: 49
+
+{"message":"Successfully Logged Out","data":null}
 ```
 
 ### Test
