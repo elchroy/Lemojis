@@ -65,7 +65,7 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
         $response = $app($request, $response, []);
 
         $result = ((string) $response->getBody());
-        $expected = '{"message":"OK","data":[{"id":1,"name":"smile","chars":"s","keywords":["these","are","not","theonly","some","of","the","keywords","i","96","realy","liked"],"category":"expressions","date_created":"2016-03-12 17:04:18","date_modified":"2016-03-12 17:04:30","created_by":"roy"},{"id":2,"name":"smiley","chars":"sly","keywords":["these","are","some","of","the","keywords","i","96","realy","liked"],"category":"expressions","date_created":"2016-02-12 17:04:20","date_modified":"2016-02-12 17:05:18","created_by":"roy"}]}';
+        $expected = '{"message":"OK","data":[{"id":1,"name":"smile","chars":"s","keywords":["these","are","not","theonly","some","of","the","keywords","i","96","realy","liked"],"category":"expressions","date_created":"2016-03-12 17:04:18","date_modified":"2016-03-12 17:04:30","created_by":"roy"},{"id":2,"name":"smiley","chars":"sly","keywords":["these","are","some","of","the","keywords","i","96","realy","liked"],"category":"expressions","date_created":"2016-02-12 17:04:20","date_modified":"2016-02-12 17:05:18","created_by":"roy"},{"id":3,"name":"fascmix","chars":"fly","keywords":["these","are","notsome","keywakfjlords","i","96","realy","liked"],"category":"imaginations","date_created":"2016-02-12 17:04:20","date_modified":"2016-02-12 17:05:18","created_by":"royally"}]}';
         $this->assertSame($expected, $result);
     }
 
@@ -141,6 +141,15 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
             'date_created'  => '2016-02-12 17:04:20',
             'date_modified' => '2016-02-12 17:05:18',
             'created_by'    => 'roy',
+        ]);
+        Emoji::create([
+            'name'          => 'fascmix',
+            'chars'         => 'fly',
+            'keywords'      => json_encode(["these","are","notsome","keywakfjlords","i","96","realy","liked"]),
+            'category'      => 'imaginations',
+            'date_created'  => '2016-02-12 17:04:20',
+            'date_modified' => '2016-02-12 17:05:18',
+            'created_by'    => 'royally',
         ]);
     }
 
@@ -382,6 +391,93 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
 
         $result = ((string) $response->getBody());
         $expected = '{"message":"The emoji has been updated successfully.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testPutFailsifUserIsNotCorrectOwner()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        User::truncate();
+        $this->populateUser();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD'     => 'PUT',
+            'REQUEST_URI'        => '/emojis/3',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name'     => 'frownie',
+            'chars'    => 'f',
+            'keywords' => 'f frown frownie',
+            'category' => 'facial expressions',
+        ]);
+        $response = new \Slim\Http\Response();
+        $app = $this->app;
+        $response = $app($request, $response, []);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"You can only update your own emoji.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testPatchFailsifUserIsNotCorrectOwner()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        User::truncate();
+        $this->populateUser();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD'     => 'PATCH',
+            'REQUEST_URI'        => '/emojis/3',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name'     => 'frownie',
+            'chars'    => 'f',
+            'keywords' => 'f frown frownie',
+            'category' => 'facial expressions',
+        ]);
+        $response = new \Slim\Http\Response();
+        $app = $this->app;
+        $response = $app($request, $response, []);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"You can only update your own emoji.","data":null}';
+        $this->assertSame($expected, $result);
+    }
+
+    public function testDeleteFailsifUserIsNotCorrectOwner()
+    {
+        $token = $this->createToken('roy');
+        Emoji::truncate();
+        $this->populateEmoji();
+        User::truncate();
+        $this->populateUser();
+        $environment = \Slim\Http\Environment::mock([
+            'REQUEST_METHOD'     => 'PUT',
+            'REQUEST_URI'        => '/emojis/3',
+            'HTTP_AUTHORIZATION' => $token,
+            ]
+        );
+        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request = $request->withParsedBody([
+            'name'     => 'frownie',
+            'chars'    => 'f',
+            'keywords' => 'f frown frownie',
+            'category' => 'facial expressions',
+        ]);
+        $response = new \Slim\Http\Response();
+        $app = $this->app;
+        $response = $app($request, $response, []);
+
+        $result = ((string) $response->getBody());
+        $expected = '{"message":"You can only update your own emoji.","data":null}';
         $this->assertSame($expected, $result);
     }
 

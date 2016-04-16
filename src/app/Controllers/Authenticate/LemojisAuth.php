@@ -4,6 +4,7 @@ namespace Elchroy\Lemojis\Controllers\Authenticate;
 
 use Elchroy\Lemojis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
 use Elchroy\Lemojis\Controllers\UsersController;
+use Elchroy\Lemojis\Controllers\LemojisController;
 use Elchroy\Lemojis\Models\LemojisUser as User;
 use Firebase\JWT\JWT;
 
@@ -177,6 +178,9 @@ class LemojisAuth
 
         $username = ($decodedToken->data->username);
 
+        if ($request->isPut() || $request->isPatch() || $request->isDelete()) {
+            $request = $request->withAttribute('LoggedUser', $username);
+        }
         /*
          * If the user already has a token value as one of his properties, then return a message that the user has logged out. The message is JSON encoded.
          */
