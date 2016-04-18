@@ -45,8 +45,8 @@ class Connection
     {
         $path = $path == null ? __DIR__.'/../../../../../../config.ini' : $path;
         $config = @parse_ini_file($path);
-        if ($config == false ) {
-            throw new WrongConfigurationException("Ensure that the config.ini file has been created at the root directory of your application.");
+        if ($config == false) {
+            throw new WrongConfigurationException('Ensure that the config.ini file has been created at the root directory of your application.');
         }
         $driver = $config['driver'];
         if ($driver == 'sqlite') {

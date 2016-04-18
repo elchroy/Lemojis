@@ -146,12 +146,13 @@ class LemojisController
      * @param  The slim request object.
      * @param  The emoji to be checked against the user.
      *
-     * @return TRUE if the user is the owner of the emoji. FALSE otherwise.
+     * @return true if the user is the owner of the emoji. FALSE otherwise.
      */
     private function isUsersEmoji($request, $emoji)
     {
         $username = $request->getAttribute('LoggedUser');
         $owner = $emoji->created_by;
+
         return $owner == $username;
     }
 
