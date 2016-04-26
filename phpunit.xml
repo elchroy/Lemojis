@@ -1,0 +1,22 @@
+<phpunit
+        bootstrap="vendor/autoload.php"
+        colors="true"
+        convertErrorstoExceptions="true"
+        convertNoticestoExceptions="true"
+        convertWarningstoExceptions="true"
+        processIsolation="false"
+        stopOnFailure="false"
+        syntaxCheck="false"
+>
+    <testsuites>
+        <testsuite name="App Tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml" />
+    </logging>
+
+</phpunit>
