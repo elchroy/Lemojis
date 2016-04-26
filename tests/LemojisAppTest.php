@@ -137,7 +137,7 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
         Emoji::create([
             'name'          => 'smile',
             'chars'         => 's',
-            'keywords'      => json_encode(["these","are","not","theonly","some","of","the","keywords","i","96","realy","liked"]),
+            'keywords'      => json_encode(['these', 'are', 'not', 'theonly', 'some', 'of', 'the', 'keywords', 'i', '96', 'realy', 'liked']),
             'category'      => 'expressions',
             'date_created'  => '2016-03-12 17:04:18',
             'date_modified' => '2016-03-12 17:04:30',
@@ -146,7 +146,7 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
         Emoji::create([
             'name'          => 'smiley',
             'chars'         => 'sly',
-            'keywords'      => json_encode(["these","are","some","of","the","keywords","i","96","realy","liked"]),
+            'keywords'      => json_encode(['these', 'are', 'some', 'of', 'the', 'keywords', 'i', '96', 'realy', 'liked']),
             'category'      => 'expressions',
             'date_created'  => '2016-02-12 17:04:20',
             'date_modified' => '2016-02-12 17:05:18',
@@ -155,7 +155,7 @@ class LemojisAppTest extends \PHPUnit_Framework_TestCase
         Emoji::create([
             'name'          => 'fascmix',
             'chars'         => 'fly',
-            'keywords'      => json_encode(["these","are","notsome","keywakfjlords","i","96","realy","liked"]),
+            'keywords'      => json_encode(['these', 'are', 'notsome', 'keywakfjlords', 'i', '96', 'realy', 'liked']),
             'category'      => 'imaginations',
             'date_created'  => '2016-02-12 17:04:20',
             'date_modified' => '2016-02-12 17:05:18',

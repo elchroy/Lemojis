@@ -4,7 +4,6 @@ namespace Elchroy\Lemojis\Controllers\Authenticate;
 
 use Elchroy\Lemojis\Controllers\Traits\ReturnJsonTrait as ReturnJson;
 use Elchroy\Lemojis\Controllers\UsersController;
-use Elchroy\Lemojis\Controllers\LemojisController;
 use Elchroy\Lemojis\Models\LemojisUser as User;
 use Firebase\JWT\JWT;
 
@@ -56,7 +55,7 @@ class LemojisAuth
 
         $tokenResponse = $this->returnJSONTokenResponse($response, $this->createToken($username, $tokenTime), 'Logged In Successfully', 200);
 
-        return $tokenResponse;#.'Edit this message and return a json enhanced message';
+        return $tokenResponse; //.'Edit this message and return a json enhanced message';
     }
 
     /**
